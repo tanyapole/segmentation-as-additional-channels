@@ -19,7 +19,7 @@ chmod u+x bash_scripts/prepare.sh
    4. *resize_size*
    5. *number_of_parallel_jobs*
 ~~~~
-. bash_scripts/prepare.sh /home/irek/My_work/train/data/ /home/irek/My_work/train/binary/ /home/irek/My_work/train/ttt/ 224 12
+. bash_scripts/prepare.sh ./Data/skin_images/ ./Data/skin_masks/ ./Data/h5/ 224 12
 ~~~~
 ## Experiments
 
