@@ -26,8 +26,8 @@ if __name__ == "__main__":
     arg('--begin-number', type=int, default=20)
     arg('--show-model', action='store_true')
     arg('--jaccard-weight', type=float, default=0.)
-    arg('--attribute', type=str, nargs='*', default='attribute_all')
-    arg('--mode', type=str, default='simple', choices=['simple', 'classic_AL', 'grid_AL'])
+    arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
+    arg('--mode', type=str, default='simple', choices=['simple'])
     arg('--freezing', action='store_true')
     arg('--jac_train', action='store_true')
     arg('--cuda1', action='store_true')
@@ -71,4 +71,4 @@ if __name__ == "__main__":
                             i += 1
                     else:
                         print('strange')
-    results.to_csv('results.csv', index=False)
+    results.to_csv('Results/results.csv', index=False)
