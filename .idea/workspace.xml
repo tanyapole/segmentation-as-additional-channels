@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="05e765b1-54fb-4cbc-bcca-24d5ea1b4973" name="Default Changelist" comment="">
+    <list default="true" id="05e765b1-54fb-4cbc-bcca-24d5ea1b4973" name="Default Changelist" comment="modification prepare.sh">
       <change afterPath="$PROJECT_DIR$/Data/scin_masks/ISIC_0000000_attribute_globules.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/scin_masks/ISIC_0000000_attribute_milia_like_cyst.png" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/scin_masks/ISIC_0000000_attribute_negative_network.png" afterDir="false" />
@@ -15567,7 +15567,6 @@
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016071.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016072.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bash_scripts/prepare.sh" beforeDir="false" afterPath="$PROJECT_DIR$/Bash_scripts/prepare.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15588,6 +15587,7 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="IgnoredFileRootStore">
     <option name="generatedRoots">
@@ -15675,7 +15675,21 @@
       <option name="project" value="LOCAL" />
       <updated>1582848269549</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="modification prepare.sh">
+      <created>1582872206155</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1582872206155</updated>
+    </task>
+    <task id="LOCAL-00009" summary="remove similarities_table_64.npy">
+      <created>1582872305739</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1582872305739</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -15684,21 +15698,23 @@
     <MESSAGE value="merging" />
     <MESSAGE value="refactoring" />
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="modification prepare.sh" />
+    <MESSAGE value="remove similarities_table_64.npy" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove similarities_table_64.npy" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="588" y="214" width="800" height="677" key="#Notifications" timestamp="1582841130700">
+    <state x="588" y="214" width="800" height="677" key="#Notifications" timestamp="1582872289533">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="214" width="800" height="677" key="#Notifications/67.27.1853.1053@67.27.1853.1053" timestamp="1582841130700" />
+    <state x="588" y="214" width="800" height="677" key="#Notifications/67.27.1853.1053@67.27.1853.1053" timestamp="1582872289533" />
     <state x="726" y="301" width="524" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1582846245598">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="726" y="301" width="524" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582846245598" />
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1582872149495">
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1582872239391">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1582872149495" />
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1582872239391" />
     <state x="548" y="408" width="424" height="484" key="FileChooserDialogImpl" timestamp="1582416054579">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -15711,14 +15727,18 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="482" y="187" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1582416146692" />
-    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2" timestamp="1582846960739">
+    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2" timestamp="1582872329930">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1582846960739" />
+    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1582872329930" />
     <state x="649" y="380" key="com.intellij.ide.util.TipDialog" timestamp="1582394950684">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="649" y="380" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582394950684" />
+    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1582872879799">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/67.27.1853.1053@67.27.1853.1053" timestamp="1582872879799" />
     <state x="650" y="346" width="687" height="413" key="git4idea.merge.GitMergeDialog" timestamp="1582842465286">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
