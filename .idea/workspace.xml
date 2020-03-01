@@ -2597,7 +2597,6 @@
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016071.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016072.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bash_scripts/run_exp.sh" beforeDir="false" afterPath="$PROJECT_DIR$/Bash_scripts/run_exp.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -2727,7 +2726,14 @@
       <option name="project" value="LOCAL" />
       <updated>1583094258686</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="modification run_exp.sh">
+      <created>1583095740515</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1583095740515</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -2739,7 +2745,8 @@
     <MESSAGE value="modification prepare.sh" />
     <MESSAGE value="remove similarities_table_64.npy" />
     <MESSAGE value="code refactoring &amp;&amp; working experiments" />
-    <option name="LAST_COMMIT_MESSAGE" value="code refactoring &amp;&amp; working experiments" />
+    <MESSAGE value="modification run_exp.sh" />
+    <option name="LAST_COMMIT_MESSAGE" value="modification run_exp.sh" />
   </component>
   <component name="WindowStateProjectService">
     <state x="588" y="214" width="800" height="677" key="#Notifications" timestamp="1582872289533">
@@ -2750,10 +2757,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="726" y="301" width="524" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582846245598" />
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1583095699440">
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1583096135444">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1583095699440" />
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1583096135444" />
     <state x="548" y="408" width="424" height="484" key="FileChooserDialogImpl" timestamp="1582416054579">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -2774,10 +2781,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="649" y="380" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582394950684" />
-    <state x="677" y="238" width="612" height="628" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1583094162896">
+    <state x="677" y="238" width="612" height="628" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1583096128224">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="677" y="238" width="612" height="628" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583094162896" />
+    <state x="677" y="238" width="612" height="628" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583096128224" />
     <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583095199387">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
