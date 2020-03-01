@@ -30,7 +30,7 @@ chmod u+x bash_scripts/prepare.sh
 chmod u+x bash_scripts/run_exp.sh
 ~~~~
 4. To repeat experiment run *run_exp.sh* with following parameters:
-   1. *path/to/h5/files/
+   1. *path/to/h5/files/*
 ~~~~
 . Bash_scripts/run_exp.sh Data/h5/
 ~~~~
@@ -38,8 +38,8 @@ During experiments you can observe metrics and losses using tensorboard as:
 ~~~~
 tensorboard --logdir runs
 ~~~~
-All hyperparameters and log during experiments are saving in the './runs/debug' folder.
-Also all results will be stored as csv file in the './Results/<start_day&time_of_the_experiment>/results.csv'
+All hyperparameters and log during experiments are saving in the *'./runs/debug' folder*. <br>
+Also all results will be stored as csv file in the *'./Results/<start_day&time_of_the_experiment>/results.csv'*
 
 ## Tasks
 - [x] Refactor code
