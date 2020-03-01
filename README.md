@@ -19,20 +19,21 @@ chmod u+x bash_scripts/prepare.sh
    4. *resize_size*
    5. *number_of_parallel_jobs*
 ~~~~
-. bash_scripts/prepare.sh ./Data/skin_images/ ./Data/skin_masks/ ./Data/h5/ 224 12
+. Bash_scripts/prepare.sh Data/skin_images/ Data/skin_masks/ Data/h5/ 224 12
 ~~~~
 ## Experiments
 
 1. Prepare data as it stated in "Data preporation" section
-Run shell prompt from root of the project.
-2. Execute command to make the script runnable for you
+2. Run shell prompt from root of the project.
+3. Execute command to make the script runnable for you
 ~~~~
 chmod u+x bash_scripts/run_exp.sh
 ~~~~
-3. To repeat experiment run *run_exp.sh*
+4. To repeat experiment run *run_exp.sh*
 ~~~~
-. bash_scripts/run_exp.sh
+. Bash_scripts/run_exp.sh 
 ~~~~
+During experiments 
 
 ## Tasks
 - [x] Refactor code
