@@ -1,9 +1,10 @@
 import argparse
 from pathlib import Path
 import pandas as pd
-import json
 import os
 from train import train
+import datetime
+from Utils.utils import print_save_results
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
@@ -22,12 +23,9 @@ if __name__ == "__main__":
     arg('--augment-list', type=list, nargs='*', default=[])
     arg('--image-path', type=str, default='/home/irek/My_work/train/h5_224/')
     arg('--n-epochs', type=int, default=1)
-    arg('--K-models', type=int, default=5)
-    arg('--begin-number', type=int, default=20)
     arg('--show-model', action='store_true')
     arg('--jaccard-weight', type=float, default=0.)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
-    arg('--mode', type=str, default='simple', choices=['simple'])
     arg('--freezing', action='store_true')
     arg('--jac_train', action='store_true')
     arg('--cuda1', action='store_true')
@@ -37,12 +35,14 @@ if __name__ == "__main__":
     root.mkdir(exist_ok=True, parents=True)
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
-    results = pd.DataFrame(columns=['freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
+    results = pd.DataFrame(columns=['mask_usage', 'freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
                                     'recall'])
     N = args.N
     learning_rates = args.lr
     freeze_modes = [False, True]
     mask_use = [True, False]
+    time = datetime.datetime.now().strftime('%d %H:%M')
+    i = 0
 
     for m_use in mask_use:
         args.mask_use = m_use
@@ -52,23 +52,6 @@ if __name__ == "__main__":
                 args.lr = lr
                 for experiment in range(N):
                     args.N = experiment
-                    print('Использование масок на трейне {} Заморозка {}, шаг обучения {}, '
-                          'номер эксперимента {}'.format(args.mask_use, args.freezing, args.lr, args.N))
-                    if args.mode == 'simple':
-                        i = 0
-                        root.joinpath('params'+str(i)+'.json').write_text(
-                            json.dumps(vars(args), indent=True, sort_keys=True))
-                        results = train(args, results)
-                        i += 1
-                    elif args.jac_train:
-                        configs = {'jaccard-weight': [0., 0.5, 1.]}
-                        i = 0
-                        for m in configs['jaccard-weight']:
-                            args.jaccard_weight = m
-                            root.joinpath('params' + str(i) + '.json').write_text(
-                                json.dumps(vars(args), indent=True, sort_keys=True))
-                            results = train(args, results)
-                            i += 1
-                    else:
-                        print('strange')
-    results.to_csv('Results/results.csv', index=False)
+                    results = train(args, results)
+                    print_save_results(args, results, root, i, time)
+                    i += 1

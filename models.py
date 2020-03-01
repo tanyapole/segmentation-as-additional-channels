@@ -26,11 +26,6 @@ def create_model(args, device):
             model = models.resnet152(pretrained=True)
         else:
             model = models.resnet152()
-    elif args.model == 'inception_v3':
-        if args.pretrained:
-            model = models.inception_v3(pretrained=True)
-        else:
-            model = models.inception_v3(aux_logits=False)
     else:
         return
 
@@ -58,10 +53,6 @@ def create_model(args, device):
         model.features[0] = nn.Conv2d(input_num, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
-    elif args.model == 'inception_v3':
-        model.Conv2d_1a_3x3.conv = nn.Conv2d(input_num, 32, kernel_size=(3, 3), stride=(2, 2), bias=False)
-        last_layer_in_channels = model.fc.in_features
-        model.fc = nn.Linear(last_layer_in_channels, out_shape)
     model.to(device)
     optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=1e-5)
 

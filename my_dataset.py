@@ -19,13 +19,12 @@ class MyDataset(Dataset):
         self.mask_use = args.mask_use
         self.augment_list = args.augment_list
         self.train = train
-        self.mode = args.mode
         self.all_attributes = ['attribute_globules', 'attribute_milia_like_cyst', 'attribute_negative_network',
                                'attribute_pigment_network', 'attribute_streaks']
 
         self.indexes = [i for i, val in enumerate(self.all_attributes) for attr in self.attribute if attr == val]
 
-        if train == 'train' or train == 'active':
+        if train == 'train':
             self.labels_ids = self.labels_ids[self.train_test_id['Split'] == 'train'].values.astype('uint8')
             self.train_test_id = self.train_test_id[self.train_test_id['Split'] == 'train'].ID.values
             #print('Train =', self.train, 'train_test_id.shape: ', self.train_test_id.shape)

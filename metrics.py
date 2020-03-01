@@ -32,16 +32,9 @@ class Metrics:
         self.prec.reset()
         self.rec.reset()
 
-    def compute_valid(self, loss):
-        return {'loss': loss.detach().cpu().numpy(),
-                'accuracy': self.acc.compute(),
-                'precision': self.prec.compute(),
-                'recall': self.rec.compute(),
-                }
+    def compute(self, loss, ep, epoch_time):
 
-    def compute_train(self, loss, ep, epoch_time):
-
-        return {'epoch': int(ep),
+        return {'epoch': ep,
                 'loss': loss.detach().cpu().numpy(),
                 'accuracy': self.acc.compute(),
                 'precision': self.prec.compute(),
