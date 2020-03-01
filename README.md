@@ -31,7 +31,7 @@ chmod u+x bash_scripts/run_exp.sh
 ~~~~
 4. To repeat experiment run *run_exp.sh*
 ~~~~
-. Bash_scripts/run_exp.sh 
+. Bash_scripts/run_exp.sh Data/h5/
 ~~~~
 During experiments 
 
