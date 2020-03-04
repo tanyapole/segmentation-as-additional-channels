@@ -35,7 +35,7 @@ class Metrics:
     def compute(self, loss, ep, epoch_time):
 
         return {'epoch': ep,
-                'loss': loss.detach().cpu().numpy(),
+                'loss': loss.item(),
                 'accuracy': self.acc.compute(),
                 'precision': self.prec.compute(),
                 'recall': self.rec.compute(),

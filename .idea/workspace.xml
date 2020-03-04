@@ -2596,7 +2596,9 @@
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016070.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016071.jpg" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/Data/skin_images/ISIC_0016072.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/metrics.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -2733,7 +2735,14 @@
       <option name="project" value="LOCAL" />
       <updated>1583095740515</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="modification prepare.sh">
+      <created>1583096176086</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1583096176086</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -2742,11 +2751,11 @@
     <MESSAGE value="merging" />
     <MESSAGE value="refactoring" />
     <MESSAGE value="Initial commit" />
-    <MESSAGE value="modification prepare.sh" />
     <MESSAGE value="remove similarities_table_64.npy" />
     <MESSAGE value="code refactoring &amp;&amp; working experiments" />
     <MESSAGE value="modification run_exp.sh" />
-    <option name="LAST_COMMIT_MESSAGE" value="modification run_exp.sh" />
+    <MESSAGE value="modification prepare.sh" />
+    <option name="LAST_COMMIT_MESSAGE" value="modification prepare.sh" />
   </component>
   <component name="WindowStateProjectService">
     <state x="588" y="214" width="800" height="677" key="#Notifications" timestamp="1582872289533">
@@ -2757,10 +2766,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="726" y="301" width="524" height="502" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1582846245598" />
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1583096135444">
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2" timestamp="1583307629611">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1583096135444" />
+    <state x="538" y="96" width="901" height="912" key="CommitChangelistDialog2/67.27.1853.1053@67.27.1853.1053" timestamp="1583307629611" />
     <state x="548" y="408" width="424" height="484" key="FileChooserDialogImpl" timestamp="1582416054579">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -2773,10 +2782,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="482" y="187" key="SettingsEditor/67.27.1853.1053@67.27.1853.1053" timestamp="1582416146692" />
-    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2" timestamp="1583094295530">
+    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2" timestamp="1583096205181">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1583094295530" />
+    <state x="588" y="288" width="800" height="528" key="Vcs.Push.Dialog.v2/67.27.1853.1053@67.27.1853.1053" timestamp="1583096205181" />
     <state x="649" y="380" key="com.intellij.ide.util.TipDialog" timestamp="1582394950684">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
@@ -2785,10 +2794,10 @@
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
     <state x="677" y="238" width="612" height="628" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1583096128224" />
-    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583095199387">
+    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583307590808">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
-    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/67.27.1853.1053@67.27.1853.1053" timestamp="1583095199387" />
+    <state x="761" y="472" width="454" height="160" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/67.27.1853.1053@67.27.1853.1053" timestamp="1583307590808" />
     <state x="650" y="346" width="687" height="413" key="git4idea.merge.GitMergeDialog" timestamp="1582842465286">
       <screen x="67" y="27" width="1853" height="1053" />
     </state>
