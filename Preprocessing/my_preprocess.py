@@ -42,7 +42,6 @@ def load_image(ind, img_id, args):
     img_np = img_to_array(img)
     ### only 0-255 integers
     img_np = img_np.astype(np.uint8)
-    print(img_np.shape)
     hdf5_file = h5py.File(args.svpath + '%s.h5' % img_id, 'w')
     hdf5_file.create_dataset('img', data=img_np, dtype=np.uint8)
     hdf5_file.close()
