@@ -14,9 +14,9 @@ def prepare_data():
 
     parser = argparse.ArgumentParser()
     arg = parser.add_argument
-    arg('--impath', type=str, default='/home/irek/My_work/train/data/')
-    arg('--maskpath', type=str, default='/home/irek/My_work/train/binary/')
-    arg('--svpath', type=str, default='/home/irek/My_work/train/_/')
+    arg('--impath', type=str, default='./Data/skin_images/')
+    arg('--maskpath', type=str, default='./Data/skin_masks/')
+    arg('--svpath', type=str, default='./Data/h5/')
     arg('--size', type=int, default=224)
     arg('--jobs', type=int, default=1)
     args = parser.parse_args()
@@ -42,13 +42,14 @@ def load_image(ind, img_id, args):
     img_np = img_to_array(img)
     ### only 0-255 integers
     img_np = img_np.astype(np.uint8)
+    print(img_np.shape)
     hdf5_file = h5py.File(args.svpath + '%s.h5' % img_id, 'w')
     hdf5_file.create_dataset('img', data=img_np, dtype=np.uint8)
     hdf5_file.close()
     ################
 
     attr_types = ['globules', 'milia_like_cyst', 'negative_network', 'pigment_network', 'streaks']
-    masks = np.zeros(shape=(img_np.shape[0], img_np.shape[1], 5))
+
     for i, attr in enumerate(attr_types):
         mask_file = args.maskpath + '%s_attribute_%s.png' % (img_id, attr)
         m = load_img(mask_file, target_size=(args.size, args.size), color_mode="grayscale")  # this is a PIL image

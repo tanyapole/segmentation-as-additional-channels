@@ -1,14 +1,10 @@
 import argparse
-from pathlib import Path
-import pandas as pd
+
 import os
-import datetime
-from Utils.utils import print_save_results
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import time
-import numpy as np
 import pandas as pd
-from tensorboardX import SummaryWriter
 import torch
 import torch.nn
 from torch.backends import cudnn
@@ -30,9 +26,9 @@ def train(args, results):
 
     train_test_id = pd.read_csv('Data/train_test_id.csv')
     mask_ind = pd.read_csv('Data/mask_ind.csv')
-    print(train_test_id)
+
     # uncomment for debugging
-    """train_loader = make_loader(train_test_id, mask_ind, args, annotated, train='train', shuffle=True)
+    train_loader = make_loader(train_test_id, mask_ind, args, train='train', shuffle=True)
     print('--' * 10)
     print('check data')
     train_image, train_labels_ind, name = next(iter(train_loader))
@@ -42,7 +38,7 @@ def train(args, results):
     print('train_image.max', train_image.max().item())
     print('train_label_ind.min', train_labels_ind.min().item())
     print('train_label_ind.max', train_labels_ind.max().item())
-    print('--' * 10)"""
+    print('--' * 10)
 
     cudnn.benchmark = True
     torch.set_default_tensor_type(torch.cuda.FloatTensor)
@@ -55,8 +51,6 @@ def train(args, results):
         print(model)
 
     criterion = LossBinary(args.jaccard_weight)
-
-    log = root.joinpath('train.log').open('at', encoding='utf8')
 
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
@@ -80,6 +74,7 @@ def train(args, results):
 def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, optimizer, results, metric, epoch,
               scheduler):
     start_time = time.time()
+
     loader = make_loader(train_test_id, mask_ind, args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':
@@ -127,7 +122,8 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                               'recall': metrics['recall']}, ignore_index=True)
 
     metric.reset()
-
+    if mode == 'train':
+        torch.save(model.state_dict(), './Saved_models/model')
     return metrics, results
 
 
@@ -160,5 +156,5 @@ if __name__ == "__main__":
     results = pd.DataFrame(columns=['mask_usage', 'freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
                                     'recall'])
 
-    time = datetime.datetime.now().strftime('%d %H:%M')
+    #time = datetime.datetime.now().strftime('%d %H:%M')
     results = train(args, results)
