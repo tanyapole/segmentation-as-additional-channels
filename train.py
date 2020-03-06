@@ -105,7 +105,10 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             optimizer.step()
 
         outputs = torch.sigmoid(output_probs)
-        metric.update(outputs, labels_batch)
+
+        outputs = np.around(outputs.data.cpu().numpy().ravel())
+        labels_batch = labels_batch.data.cpu().numpy().ravel()
+        metric.update(labels_batch, outputs)
 
     if mode == 'valid':
         torch.set_grad_enabled(True)
@@ -115,8 +118,14 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
 
     metrics = metric.compute(loss, epoch, epoch_time)
 
-    print('Epoch: {} Loss: {:.6f} Prec: {:.4f} Recall: {:.4f} Time: {:.4f}'.format(
-            epoch, metrics['loss'], metrics['precision'], metrics['recall'], metrics['epoch_time']))
+    print('Epoch: {} Loss: {:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} Time: {:.4f}'.format(
+        metrics['epoch'],
+        metrics['loss'],
+        metrics['accuracy'],
+        metrics['precision'],
+        metrics['recall'],
+        metrics['f1_score'],
+        metrics['epoch_time']))
 
     results = results.append({'freeze_mode': args.freezing,
                               'lr': args.lr,

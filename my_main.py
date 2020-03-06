@@ -21,7 +21,7 @@ if __name__ == "__main__":
     arg('--lr', type=float, nargs='*', default=[0.001])
     arg('--batch-size', type=int, default=1)
     arg('--augment-list', type=list, nargs='*', default=[])
-    arg('--image-path', type=str, default='/home/irek/My_work/train/h5_224/')
+    arg('--image-path', type=str, default='./Data/h5/')
     arg('--n-epochs', type=int, default=1)
     arg('--show-model', action='store_true')
     arg('--jaccard-weight', type=float, default=0.)
