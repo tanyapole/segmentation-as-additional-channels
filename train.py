@@ -9,7 +9,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 import json
 from pathlib import Path
 from loss import LossBinary
-from Utils.utils import write_event, write_tensorboard
+from Utils.utils import write_tensorboard
 from my_dataset import make_loader
 from models import create_model
 from metrics import Metrics
@@ -52,8 +52,6 @@ def train(args, results):
 
     criterion = LossBinary(args.jaccard_weight)
 
-    log = root.joinpath('train.log').open('at', encoding='utf8')
-
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
     writer = SummaryWriter()
@@ -68,13 +66,11 @@ def train(args, results):
                                                 args=args, device=device, criterion=criterion, optimizer=optimizer,
                                                 results=results, metric=metric, epoch=ep, scheduler=scheduler)
 
-            write_event(log, metrics=metrics)
             write_tensorboard(writer, metrics=metrics, args=args)
 
         except KeyboardInterrupt:
             return
     writer.close()
-    log.close()
     return results
 
 
@@ -127,13 +123,16 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
         metrics['f1_score'],
         metrics['epoch_time']))
 
-    results = results.append({'freeze_mode': args.freezing,
+    results = results.append({'mask_use': args.mask_use,
+                              'freeze_mode': args.freezing,
                               'lr': args.lr,
                               'exp': args.N,
                               'train_mode': mode,
                               'epoch': epoch,
                               'loss': metrics['loss'],
+                              'acc': metrics['accuracy'],
                               'prec': metrics['precision'],
+                              'f1':metrics['f1_score'],
                               'recall': metrics['recall']}, ignore_index=True)
 
     metric.reset()

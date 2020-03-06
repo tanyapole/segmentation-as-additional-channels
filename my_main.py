@@ -35,12 +35,12 @@ if __name__ == "__main__":
     root.mkdir(exist_ok=True, parents=True)
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
-    results = pd.DataFrame(columns=['mask_usage', 'freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
+    results = pd.DataFrame(columns=['mask_use', 'freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
                                     'recall'])
     N = args.N
     learning_rates = args.lr
     freeze_modes = [False, True]
-    mask_use = [True, False]
+    mask_use = [False, True]
     time = datetime.datetime.now().strftime('%d %H:%M')
     i = 0
 

@@ -60,6 +60,14 @@ def write_tensorboard(writer, metrics, args):
                                         args.N, args.lr): valid_metrics['accuracy']},
                        train_metrics['epoch'])
 
+    writer.add_scalars('f1 score', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
+                                                                                     args.N, args.lr): train_metrics[
+        'f1_score'],
+                                    'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
+                                                                                     args.N, args.lr): valid_metrics[
+                                        'f1_score']},
+                       train_metrics['epoch'])
+
 
 def save_weights(model, model_path, ep, train_metrics, valid_metrics):
     torch.save({'model': model.state_dict(),
@@ -68,20 +76,3 @@ def save_weights(model, model_path, ep, train_metrics, valid_metrics):
                 'train_loss': train_metrics['loss1']},
                str(model_path)
                )
-
-
-def write_event(log, metrics):
-    train_metrics, valid_metrics = metrics
-    CMD='epoch:{} time:{:.2f} train_loss:{:.4f} train_precision:{:.3f} train_recall:{:.3f} valid_loss:{:.4f} ' \
-        'valid_precision:{:.3f} valid_recall: {:.3f}'.format(train_metrics['epoch'],
-                                                             train_metrics['epoch_time'],
-                                                             train_metrics['loss'],
-                                                             train_metrics['precision'],
-                                                             train_metrics['recall'],
-                                                             valid_metrics['loss'],
-                                                             valid_metrics['precision'],
-                                                             valid_metrics['recall']
-    )
-    log.write(json.dumps(CMD))
-    log.write('\n')
-    log.flush()
