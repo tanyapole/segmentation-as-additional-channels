@@ -1,0 +1,20 @@
+h5py==2.10.0
+Keras==2.3.1
+Keras-Preprocessing==1.1.0
+numpy==1.18.1
+opencv-python==4.2.0.32
+pandas==1.0.1
+Pillow==7.0.0
+pytorch-ignite==0.4.0
+scikit-learn==0.22.1
+scipy==1.4.1
+tensorboard==2.1.0
+tensorboardX==2.0
+tensorflow==2.1.0
+torch==1.4.0
+torchvision==0.5.0
+
+# tested on
+# cuda toolkit 10.2
+# cudnn library 7.6.5
+# ubuntu 18.04.4
