@@ -103,7 +103,8 @@ class MyDataset(Dataset):
                 image, mask = self.transform_fn(image, mask)
 
         if self.mask_use:
-            if self.train == 'valid':
+            p = np.random.uniform(0, 1)
+            if self.train == 'valid' or p > 0.5:
                 mask.fill(0.)
             image_with_mask = np.dstack((image, mask))
         else:
