@@ -18,6 +18,7 @@ class MyDataset(Dataset):
         self.attribute = args.attribute
         self.mask_use = args.mask_use
         self.augment_list = args.augment_list
+        self.prob = args.prob
         self.train = train
         self.all_attributes = ['attribute_globules', 'attribute_milia_like_cyst', 'attribute_negative_network',
                                'attribute_pigment_network', 'attribute_streaks']
@@ -104,7 +105,7 @@ class MyDataset(Dataset):
 
         if self.mask_use:
             p = np.random.uniform(0, 1)
-            if self.train == 'valid' or p > 0.5:
+            if self.train == 'valid' or p < self.prob:
                 mask.fill(0.)
             image_with_mask = np.dstack((image, mask))
         else:

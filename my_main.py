@@ -24,6 +24,7 @@ if __name__ == "__main__":
     arg('--image-path', type=str, default='./Data/h5/')
     arg('--n-epochs', type=int, default=1)
     arg('--show-model', action='store_true')
+    arg('--prob', type=float, default=0.1)
     arg('--jaccard-weight', type=float, default=0.)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
     arg('--freezing', action='store_true')
