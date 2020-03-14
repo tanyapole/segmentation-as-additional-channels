@@ -85,6 +85,16 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             print(f'\r', end='')
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
+        """if i < 5 :
+            fig = plt.figure(figsize=(10, 10))
+            ax = []
+            for i, image in enumerate(image_batch):
+                for channel in range(3, image.shape[2]):
+                    im = image.cpu().numpy()[:, :, channel]
+                    ax.append(fig.add_subplot(len(image_batch), image.shape[2], i*(image.shape[2]-3)+channel-3 + 1))
+                    ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
+                    plt.imshow(im)
+            plt.show()"""
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
 
@@ -126,6 +136,8 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                               'freeze_mode': args.freezing,
                               'lr': args.lr,
                               'exp': args.N,
+                              'cell_size': args.cell_size,
+                              'prob': args.prob,
                               'train_mode': mode,
                               'epoch': epoch,
                               'loss': metrics['loss'],

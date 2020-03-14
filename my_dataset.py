@@ -24,6 +24,8 @@ class MyDataset(Dataset):
                                'attribute_pigment_network', 'attribute_streaks']
 
         self.indexes = [i for i, val in enumerate(self.all_attributes) for attr in self.attribute if attr == val]
+        self.cell = args.cell
+        self.cell_size = args.cell_size
 
         if train == 'train':
             self.labels_ids = self.labels_ids[self.train_test_id['Split'] == 'train'].values.astype('uint8')
@@ -102,15 +104,34 @@ class MyDataset(Dataset):
         if self.train == 'train':
             if self.augment_list:
                 image, mask = self.transform_fn(image, mask)
-
+        """fig = plt.figure(figsize=(5, 5))
+        ax = []
+        for channel in range(mask.shape[2]):
+            im = mask[:, :, channel]
+            ax.append(fig.add_subplot(2, mask.shape[2], channel + 1))
+            ax[channel].set_title(name[5:]+str(np.unique(im)))
+            plt.imshow(im)
+        print(np.unique(mask))"""
         if self.mask_use:
             p = np.random.uniform(0, 1)
-            if self.train == 'valid' or p < self.prob:
+            if self.train == 'valid':
                 mask.fill(0.)
+            elif self.cell:
+                for i in range(0, image.shape[0], self.cell_size):
+                    for j in range(0, image.shape[0], self.cell_size):
+                        p = np.random.uniform(0, 1)
+                        if p < self.prob:
+                            mask[i:i+self.cell_size, j:j+self.cell_size, :].fill(0.)
             image_with_mask = np.dstack((image, mask))
         else:
             image_with_mask = image
 
+        """for channel in range(mask.shape[2]):
+            im = mask[:, :, channel]
+            ax.append(fig.add_subplot(2, mask.shape[2], mask.shape[2] + channel + 1))
+            ax[mask.shape[2] + channel].set_title(name[5:]+str(np.unique(im)))
+            plt.imshow(im)
+        plt.show()"""
         labels = np.array([self.labels_ids[index, ind] for ind in self.indexes])
 
         return image_with_mask, labels, name

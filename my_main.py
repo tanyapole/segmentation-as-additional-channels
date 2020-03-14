@@ -22,26 +22,30 @@ if __name__ == "__main__":
     arg('--batch_size', type=int, default=1)
     arg('--augment_list', type=list, nargs='*', default=[])
     arg('--image_path', type=str, default='./Data/h5/')
-    arg('--n-epochs', type=int, default=1)
-    arg('--show-model', action='store_true')
-    arg('--prob', type=float, default=0.1)
-    arg('--jaccard_weight', type=float, default=0.)
+    arg('--n_epochs', type=int, default=1)
+    arg('--show_model', action='store_true')
+    arg('--prob', type=float, nargs='*', default=0.1)
+    arg('--jaccard_weight', type=float, default=0.5)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
     arg('--freezing', action='store_true')
     arg('--jac_train', action='store_true')
     arg('--cuda1', action='store_true')
+    arg('--cell', action='store_true')
+    arg('--cell_size', type=int, nargs='*', default=[56])
     args = parser.parse_args()
 
     root = Path(args.root)
     root.mkdir(exist_ok=True, parents=True)
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
-    results = pd.DataFrame(columns=['mask_use', 'freeze_mode', 'lr', 'exp', 'train_mode', 'epoch', 'loss', 'prec',
-                                    'recall'])
+    results = pd.DataFrame(columns=['mask_use', 'freeze_mode', 'lr', 'exp', 'cell_size', 'prob', 'train_mode', 'epoch',
+                                    'loss', 'prec', 'recall'])
     N = args.N
     learning_rates = args.lr
-    freeze_modes = [False, True]
-    mask_use = [False, True]
+    freeze_modes = [False]
+    mask_use = [True, False]
+    cell_size = args.cell_size
+    probs = args.prob
     time = datetime.datetime.now().strftime('%d %H:%M')
     i = 0
 
@@ -51,8 +55,12 @@ if __name__ == "__main__":
             args.freezing = mode
             for lr in learning_rates:
                 args.lr = lr
-                for experiment in range(N):
-                    args.N = experiment
-                    results = train(args, results)
-                    print_save_results(args, results, root, i, time)
-                    i += 1
+                for cs in cell_size:
+                    args.cell_size = cs
+                    for p in probs:
+                        args.prob = p
+                        for experiment in range(N):
+                            args.N = experiment
+                            results = train(args, results)
+                            print_save_results(args, results, root, i, time)
+                            i += 1
