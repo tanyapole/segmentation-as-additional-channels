@@ -16,16 +16,16 @@ if __name__ == "__main__":
     arg('--mask_use', action='store_true')
     arg('--root', type=str, default='runs/debug')
     arg('--N', type=int, default=1)
-    arg('--batch-normalization', action='store_true')  # if --batch-normalization parameter then True
+    arg('--batch_normalization', action='store_true')  # if --batch-normalization parameter then True
     arg('--pretrained', action='store_true')           # if --pretrained parameter then True
     arg('--lr', type=float, nargs='*', default=[0.001])
-    arg('--batch-size', type=int, default=1)
-    arg('--augment-list', type=list, nargs='*', default=[])
-    arg('--image-path', type=str, default='./Data/h5/')
+    arg('--batch_size', type=int, default=1)
+    arg('--augment_list', type=list, nargs='*', default=[])
+    arg('--image_path', type=str, default='./Data/h5/')
     arg('--n-epochs', type=int, default=1)
     arg('--show-model', action='store_true')
     arg('--prob', type=float, default=0.1)
-    arg('--jaccard-weight', type=float, default=0.)
+    arg('--jaccard_weight', type=float, default=0.)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
     arg('--freezing', action='store_true')
     arg('--jac_train', action='store_true')

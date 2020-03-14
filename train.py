@@ -6,7 +6,6 @@ import torch
 import torch.nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import json
 from pathlib import Path
 from loss import LossBinary
 from Utils.utils import write_tensorboard
@@ -88,7 +87,8 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             print(f'\rBatch {i} / {n} ', end='')
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
-
+        print(image_batch)
+        print(labels_batch)
         output_probs = model(image_batch)
 
         if isinstance(args.attribute, str):
