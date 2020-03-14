@@ -6,7 +6,6 @@ import torch
 import torch.nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import json
 from pathlib import Path
 from loss import LossBinary
 from Utils.utils import write_tensorboard
