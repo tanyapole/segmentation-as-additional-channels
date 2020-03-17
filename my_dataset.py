@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from Utils.utils import load_image
 import random
 import numpy as np
+import torch
 
 
 class MyDataset(Dataset):
@@ -122,6 +123,9 @@ class MyDataset(Dataset):
                         p = np.random.uniform(0, 1)
                         if p < self.prob:
                             mask[i:i+self.cell_size, j:j+self.cell_size, :].fill(0.)
+            else:
+                if p < self.prob:
+                    mask.fill(0.)
             image_with_mask = np.dstack((image, mask))
         else:
             image_with_mask = image
@@ -145,6 +149,8 @@ def make_loader(train_test_id, labels_ids, args, train=True, shuffle=True):
                          train=train)
     data_loader = DataLoader(data_set,
                              batch_size=args.batch_size,
-                             shuffle=shuffle
+                             shuffle=shuffle,
+                             num_workers=args.workers,
+                             pin_memory=torch.cuda.is_available()
                              )
     return data_loader

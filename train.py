@@ -3,18 +3,18 @@ import numpy as np
 import pandas as pd
 from tensorboardX import SummaryWriter
 import torch
-import torch.nn
+import torch.nn as nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from pathlib import Path
 from loss import LossBinary
-from Utils.utils import write_tensorboard
+from Utils.utils import write_tensorboard, save_weights
 from my_dataset import make_loader
 from models import create_model
 from metrics import Metrics
 
 
-def train(args, results):
+def train(args, results, best_f1):
 
     epoch = 0
 
@@ -44,10 +44,23 @@ def train(args, results):
     if args.cuda1:
         device = 'cuda:1'
 
-    model, optimizer = create_model(args, device)
+    if args.resume:
+        args.mask_use = False
+        model, optimizer = create_model(args, device)
+        input_num = 3 + len(args.attribute)
+        if args.model == 'resnet50':
+            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        args.mask_use = True
+        checkpoint = torch.load('model.pt')
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+    else:
+        model, optimizer = create_model(args, device)
 
     if args.show_model:
         print(model)
+
+    model = nn.DataParallel(model)
 
     criterion = LossBinary(args.jaccard_weight)
 
@@ -64,13 +77,19 @@ def train(args, results):
                 metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id, mask_ind=mask_ind,
                                                 args=args, device=device, criterion=criterion, optimizer=optimizer,
                                                 results=results, metric=metric, epoch=ep, scheduler=scheduler)
-
-            write_tensorboard(writer, metrics=metrics, args=args)
+            if metrics[0]['f1_score'] > best_f1:
+                if args.resume:
+                    name = 'resume_model.pt'
+                else:
+                    name = 'model.pt'
+                save_weights(model, name, metrics, optimizer)
+                best_f1 = metrics[0]['f1_score']
+            # write_tensorboard(writer, metrics=metrics, args=args)
 
         except KeyboardInterrupt:
             return
     writer.close()
-    return results
+    return results, best_f1
 
 
 def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, optimizer, results, metric, epoch,
@@ -115,13 +134,13 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
         labels_batch = labels_batch.data.cpu().numpy().ravel()
         metric.update(labels_batch, outputs)
 
-    if mode == 'valid':
-        torch.set_grad_enabled(True)
-        scheduler.step(loss)
-
     epoch_time = time.time() - start_time
 
     metrics = metric.compute(loss, epoch, epoch_time)
+
+    if mode == 'valid':
+        torch.set_grad_enabled(True)
+        scheduler.step(loss)
 
     print('Epoch: {} Loss: {:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} Time: {:.4f}'.format(
         metrics['epoch'],
@@ -136,6 +155,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                               'freeze_mode': args.freezing,
                               'lr': args.lr,
                               'exp': args.N,
+                              'cell': args.cell,
                               'cell_size': args.cell_size,
                               'prob': args.prob,
                               'train_mode': mode,

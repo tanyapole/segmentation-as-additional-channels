@@ -21,6 +21,11 @@ def create_model(args, device):
             model = models.resnet50(pretrained=True)
         else:
             model = models.resnet50()
+    elif args.model == 'resnext50':
+            if args.pretrained:
+                model = models.resnext50_32x4d(pretrained=True)
+            else:
+                model = models.resnext50_32x4d()
     elif args.model == 'resnet152':
         if args.pretrained:
             model = models.resnet152(pretrained=True)
@@ -41,7 +46,7 @@ def create_model(args, device):
         out_shape = len(args.attribute)
 
     # channels replacement
-    if args.model in ['resnet50', 'resnet152']:
+    if args.model in ['resnet50', 'resnext50', 'resnet152']:
         model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         last_layer_in_channels = model.fc.in_features
         model.fc = nn.Linear(last_layer_in_channels, out_shape)
@@ -50,6 +55,6 @@ def create_model(args, device):
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
     model.to(device)
-    optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=1e-5)
+    optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=0.01)
 
     return model, optimizer

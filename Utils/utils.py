@@ -69,10 +69,11 @@ def write_tensorboard(writer, metrics, args):
                        train_metrics['epoch'])
 
 
-def save_weights(model, model_path, ep, train_metrics, valid_metrics):
-    torch.save({'model': model.state_dict(),
-                'epoch_time': ep,
-                'valid_loss': valid_metrics['loss1'],
-                'train_loss': train_metrics['loss1']},
+def save_weights(model, model_path, metrics, optimizer):
+    torch.save({'model': model.module.state_dict(),
+                'epoch_time': metrics[0]['epoch'],
+                'valid_loss': metrics[1]['loss'],
+                'train_loss': metrics[0]['loss'],
+                'optimizer': optimizer.state_dict()},
                str(model_path)
                )
