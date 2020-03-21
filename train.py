@@ -47,13 +47,13 @@ def train(args, results, best_f1):
     if args.resume:
         args.mask_use = False
         model, optimizer = create_model(args, device)
+        checkpoint = torch.load('model.pt')
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
         input_num = 3 + len(args.attribute)
         if args.model == 'resnet50':
             model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         args.mask_use = True
-        checkpoint = torch.load('model.pt')
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
     else:
         model, optimizer = create_model(args, device)
 
