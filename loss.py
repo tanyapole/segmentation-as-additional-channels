@@ -1,30 +1,15 @@
-import torch
 from torch import nn
 
 
-class LossBinary:
-    """
-    Loss defined as BCE - log(soft_jaccard)
-    Vladimir Iglovikov, Sergey Mushinskiy, Vladimir Osin,
-    Satellite Imagery Feature Detection using Deep Convolutional Neural Network: A Kaggle Competition
-    arXiv:1706.06169
-    """
+class LossBinaryWithAux:
 
-    def __init__(self, jaccard_weight=0):
-        self.nll_loss = nn.BCEWithLogitsLoss()
-        self.jaccard_weight = jaccard_weight
+    def __init__(self, pos_weight):
+        self.nll_loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+        self.MSE = nn.MSELoss()
 
-    def __call__(self, outputs, targets):
+    def __call__(self, last_output, aux_output, targets):
 
-        loss = self.nll_loss(outputs, targets)
+        loss = self.nll_loss(last_output, targets)
+        loss2 = self.MSE(aux_output)
 
-        if self.jaccard_weight:
-            eps = 1e-15
-            jaccard_target = (targets == 1).float()
-            jaccard_output = torch.sigmoid(outputs)
-
-            intersection = (jaccard_output * jaccard_target).sum()
-            union = jaccard_output.sum() + jaccard_target.sum()
-
-            loss -= self.jaccard_weight * torch.log((intersection + eps) / (union - intersection + eps))
-        return loss
+        return loss + loss2

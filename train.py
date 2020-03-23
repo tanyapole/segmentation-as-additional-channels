@@ -7,7 +7,7 @@ import torch.nn as nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from pathlib import Path
-from loss import LossBinary
+from loss import LossBinaryWithAux
 from Utils.utils import write_tensorboard, save_weights
 from my_dataset import make_loader
 from models import create_model
@@ -62,7 +62,7 @@ def train(args, results, best_f1):
 
     model = nn.DataParallel(model)
 
-    criterion = LossBinary(args.jaccard_weight)
+    criterion = LossBinaryWithAux(pos_weight=torch.Tensor([0.5]))
 
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
@@ -116,20 +116,19 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             plt.show()"""
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
-        print(image_batch)
-        print(labels_batch)
-        output_probs = model(image_batch)
+        aux_output, last_output = model(image_batch)
 
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
-        loss = criterion(output_probs, labels_batch)
+
+        loss = criterion(last_output, aux_output, labels_batch)
 
         if mode == 'train':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-        outputs = torch.sigmoid(output_probs)
+        outputs = torch.sigmoid(last_output)
 
         outputs = np.around(outputs.data.cpu().numpy().ravel())
         labels_batch = labels_batch.data.cpu().numpy().ravel()
