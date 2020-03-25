@@ -62,7 +62,7 @@ def train(args, results, best_f1):
 
     model = nn.DataParallel(model)
 
-    criterion = LossBinaryWithAux(pos_weight=torch.Tensor([0.5]))
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=torch.Tensor([0.5, 1.0]).to(device))
 
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
@@ -114,14 +114,21 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                     ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
                     plt.imshow(im)
             plt.show()"""
-        image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-        labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
-        aux_output, last_output = model(image_batch)
+        image_batch = image_batch[0].permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
+        labels_batch = labels_batch[0].to(device).type(torch.cuda.FloatTensor)
+
+        last_output, aux_output = model(image_batch)
 
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
-        loss = criterion(last_output, aux_output, labels_batch)
+        loss1 = criterion(last_output, labels_batch)
+
+        l = aux_output.std(dim=0).data
+
+        loss2 = torch.sum(l)
+
+        loss = loss1 + loss2
 
         if mode == 'train':
             optimizer.zero_grad()

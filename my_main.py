@@ -53,6 +53,8 @@ if __name__ == "__main__":
     i = 0
 
     best_f1 = 0
+
+
     for m_use in mask_use:
         args.mask_use = m_use
         for lr in learning_rates:
