@@ -1,8 +1,8 @@
 from torch import nn
 from torchvision import models
 from torch.optim import Adam
-from torchvision.models.resnet import Bottleneck, model_urls, _resnet, conv1x1, conv3x3
-from torchvision.models.utils import load_state_dict_from_url
+from torchvision.models.resnet import Bottleneck, model_urls, conv1x1, conv3x3
+from torch.utils.model_zoo import load_url as load_state_dict_from_url
 import torch
 
 
@@ -129,9 +129,9 @@ def create_model(args, device):
                 model = models.vgg16()
     elif args.model == 'resnet50':
         if args.pretrained:
-            model = model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=True, progress=True)
+            model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=True, progress=True)
         else:
-            model = model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=False, progress=True)
+            model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=False, progress=True)
     elif args.model == 'resnext50':
             if args.pretrained:
                 model = models.resnext50_32x4d(pretrained=True)

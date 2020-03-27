@@ -34,6 +34,8 @@ if __name__ == "__main__":
     arg('--cell_size', type=int, nargs='*', default=[56])
     arg('--workers', type=int, default=1)
     arg('--resume', action='store_true')
+    arg('--aux', action='store_true')
+    arg('--aux_batch', type=int, default=4)
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -54,8 +56,15 @@ if __name__ == "__main__":
 
     best_f1 = 0
 
+    for lr in learning_rates:
+        args.lr = lr
+        for experiment in range(N):
+            args.N = experiment
+            results, best_f1 = train(args, results, best_f1)
+            print_save_results(args, results, root, i, time)
+            i += 1
 
-    for m_use in mask_use:
+    """for m_use in mask_use:
         args.mask_use = m_use
         for lr in learning_rates:
             args.lr = lr
@@ -85,4 +94,4 @@ if __name__ == "__main__":
                     args.N = experiment
                     results, best_f1 = train(args, results, best_f1)
                     print_save_results(args, results, root, i, time)
-                    i += 1
+                    i += 1"""

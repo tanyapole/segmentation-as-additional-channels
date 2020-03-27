@@ -27,6 +27,8 @@ class MyDataset(Dataset):
         self.indexes = [i for i, val in enumerate(self.all_attributes) for attr in self.attribute if attr == val]
         self.cell = args.cell
         self.cell_size = args.cell_size
+        self.aux = args.aux
+        self.aux_batch = args.aux_batch
 
         if train == 'train':
             self.labels_ids = self.labels_ids[self.train_test_id['Split'] == 'train'].values.astype('uint8')
@@ -113,19 +115,14 @@ class MyDataset(Dataset):
             ax[channel].set_title(name[5:]+str(np.unique(im)))
             plt.imshow(im)
         print(np.unique(mask))"""
-        if self.mask_use:
+        if self.mask_use and not self.aux:
             p = np.random.uniform(0, 1)
             if self.train == 'valid':
                 mask.fill(0.)
             elif self.cell:
-                for i in range(0, image.shape[0], self.cell_size):
-                    for j in range(0, image.shape[0], self.cell_size):
-                        p = np.random.uniform(0, 1)
-                        if p < self.prob:
-                            mask[i:i+self.cell_size, j:j+self.cell_size, :].fill(0.)
+                mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
             else:
-                if p < self.prob:
-                    mask.fill(0.)
+                mask = full_mask_clear(mask, self.prob)
             image_with_mask = np.dstack((image, mask))
         else:
             image_with_mask = image
@@ -137,8 +134,42 @@ class MyDataset(Dataset):
             plt.imshow(im)
         plt.show()"""
         labels = np.array([self.labels_ids[index, ind] for ind in self.indexes])
-
+        if self.aux and self.mask_use:
+            im, l = np.array([]), np.array([])
+            if self.train == 'train':
+                for i in range(self.aux_batch):
+                    prob = np.random.choice([0.01, 0.2, 0.8])
+                    fill_method = np.random.choice([0, 1])
+                    cell_size = np.random.choice([14, 28, 56])
+                    if fill_method == 0:
+                        mask = quatro_mask_clear(mask, image.shape[0], cell_size, prob)
+                    else:
+                        mask = full_mask_clear(mask, prob)
+                    im = np.dstack((image, mask))
+                    if i == 0:
+                        image_with_mask = np.array([im])
+                    else:
+                        image_with_mask = np.concatenate((image_with_mask, np.array([im])), axis=0)
+                return image_with_mask, np.array([labels for i in range(self.aux_batch)]), name
+            else:
+                mask.fill(0.)
+                image_with_mask = np.dstack((image, mask))
         return image_with_mask, labels, name
+
+
+def full_mask_clear(mask, prob):
+    if np.random.uniform(0, 1) < prob:
+        mask.fill(0.)
+    return mask
+
+
+def quatro_mask_clear(mask, shape, cell_size, prob):
+    for i in range(0, shape, cell_size):
+        for j in range(0, shape, cell_size):
+            p = np.random.uniform(0, 1)
+            if p < prob:
+                mask[i:i + cell_size, j:j + cell_size, :].fill(0.)
+    return mask
 
 
 def make_loader(train_test_id, labels_ids, args, train=True, shuffle=True):
@@ -151,6 +182,6 @@ def make_loader(train_test_id, labels_ids, args, train=True, shuffle=True):
                              batch_size=args.batch_size,
                              shuffle=shuffle,
                              num_workers=args.workers,
-                             pin_memory=torch.cuda.is_available()
+                             pin_memory=True
                              )
     return data_loader

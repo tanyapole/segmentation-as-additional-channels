@@ -114,9 +114,14 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                     ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
                     plt.imshow(im)
             plt.show()"""
-        image_batch = image_batch[0].permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-        labels_batch = labels_batch[0].to(device).type(torch.cuda.FloatTensor)
 
+        if mode == 'train':
+            image_batch = image_batch[0]
+            labels_batch = labels_batch[0]
+
+        image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
+
+        labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
         last_output, aux_output = model(image_batch)
 
         if isinstance(args.attribute, str):
@@ -124,11 +129,12 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
 
         loss1 = criterion(last_output, labels_batch)
 
-        l = aux_output.std(dim=0).data
-
-        loss2 = torch.sum(l)
-
-        loss = loss1 + loss2
+        if mode == 'train':
+            l = aux_output.std(dim=0).data
+            loss2 = torch.mean(l)
+            loss = loss1 + loss2
+        else:
+            loss = loss1
 
         if mode == 'train':
             optimizer.zero_grad()
