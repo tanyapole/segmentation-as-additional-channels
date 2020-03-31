@@ -24,11 +24,11 @@ if __name__ == "__main__":
     arg('--image_path', type=str, default='./Data/h5/')
     arg('--n_epochs', type=int, default=1)
     arg('--show_model', action='store_true')
+    arg('--model_path', type=str, default='/Data/model/')
     arg('--prob', type=float, nargs='*', default=0.1)
     arg('--jaccard_weight', type=float, default=0.)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
     arg('--freezing', action='store_true')
-    arg('--jac_train', action='store_true')
     arg('--cuda1', action='store_true')
     arg('--cell', action='store_true')
     arg('--cell_size', type=int, nargs='*', default=[56])
@@ -42,12 +42,12 @@ if __name__ == "__main__":
     root.mkdir(exist_ok=True, parents=True)
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
-    results = pd.DataFrame(columns=['mask_use', 'freeze_mode', 'lr', 'exp', 'cell', 'cell_size', 'prob', 'train_mode',
-                                    'epoch', 'loss', 'prec', 'recall'])
+    results = pd.DataFrame(columns=['mask_use', 'aux', 'aux_batch', 'freeze_mode', 'lr', 'exp', 'cell', 'cell_size',
+                                    'prob', 'train_mode', 'epoch', 'acc', 'f1', 'loss', 'prec', 'recall'])
     N = args.N
     learning_rates = args.lr
     freeze_modes = [False]
-    mask_use = [True]
+    mask_use = [False]
     cell = [True, False]
     cell_size = args.cell_size
     probs = args.prob
@@ -56,24 +56,33 @@ if __name__ == "__main__":
 
     best_f1 = 0
 
-    for lr in learning_rates:
-        args.lr = lr
-        for experiment in range(N):
-            args.N = experiment
-            results, best_f1 = train(args, results, best_f1)
-            print_save_results(args, results, root, i, time)
-            i += 1
-
-    """for m_use in mask_use:
-        args.mask_use = m_use
+    if args.aux:
         for lr in learning_rates:
             args.lr = lr
-            if m_use:
-                for c in cell:
-                    args.cell = c
-                    if args.cell:
-                        for cs in cell_size:
-                            args.cell_size = cs
+            for experiment in range(N):
+                args.N = experiment
+                results, best_f1 = train(args, results, best_f1)
+                print_save_results(args, results, root, i, time)
+                i += 1
+    else:
+        for m_use in mask_use:
+            args.mask_use = m_use
+            for lr in learning_rates:
+                args.lr = lr
+                if m_use:
+                    for c in cell:
+                        args.cell = c
+                        if args.cell:
+                            for cs in cell_size:
+                                args.cell_size = cs
+                                for p in probs:
+                                    args.prob = p
+                                    for experiment in range(N):
+                                        args.N = experiment
+                                        results, best_f1 = train(args, results, best_f1)
+                                        print_save_results(args, results, root, i, time)
+                                        i += 1
+                        else:
                             for p in probs:
                                 args.prob = p
                                 for experiment in range(N):
@@ -81,17 +90,9 @@ if __name__ == "__main__":
                                     results, best_f1 = train(args, results, best_f1)
                                     print_save_results(args, results, root, i, time)
                                     i += 1
-                    else:
-                        for p in probs:
-                            args.prob = p
-                            for experiment in range(N):
-                                args.N = experiment
-                                results, best_f1 = train(args, results, best_f1)
-                                print_save_results(args, results, root, i, time)
-                                i += 1
-            else:
-                for experiment in range(N):
-                    args.N = experiment
-                    results, best_f1 = train(args, results, best_f1)
-                    print_save_results(args, results, root, i, time)
-                    i += 1"""
+                else:
+                    for experiment in range(N):
+                        args.N = experiment
+                        results, best_f1 = train(args, results, best_f1)
+                        print_save_results(args, results, root, i, time)
+                        i += 1

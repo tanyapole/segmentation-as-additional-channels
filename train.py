@@ -7,7 +7,7 @@ import torch.nn as nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from pathlib import Path
-from loss import LossBinaryWithAux
+from loss import LossBinary
 from Utils.utils import write_tensorboard, save_weights
 from my_dataset import make_loader
 from models import create_model
@@ -47,7 +47,7 @@ def train(args, results, best_f1):
     if args.resume:
         args.mask_use = False
         model, optimizer = create_model(args, device)
-        checkpoint = torch.load('model.pt')
+        checkpoint = torch.load(args.model_path + 'model.pt')
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         input_num = 3 + len(args.attribute)
@@ -62,7 +62,7 @@ def train(args, results, best_f1):
 
     model = nn.DataParallel(model)
 
-    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=torch.Tensor([0.5, 1.0]).to(device))
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=None) # torch.Tensor([0.5, 1.0]).to(device)
 
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
@@ -77,11 +77,12 @@ def train(args, results, best_f1):
                 metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id, mask_ind=mask_ind,
                                                 args=args, device=device, criterion=criterion, optimizer=optimizer,
                                                 results=results, metric=metric, epoch=ep, scheduler=scheduler)
-            if metrics[0]['f1_score'] > best_f1:
+            #if metrics[0]['f1_score'] > best_f1:
+            if ep == 199:
                 if args.resume:
-                    name = 'resume_model.pt'
+                    name = '{}resume_model_{}.pt'.format(args.model_path, args.N)
                 else:
-                    name = 'model.pt'
+                    name = '{}model_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, metrics, optimizer)
                 best_f1 = metrics[0]['f1_score']
             # write_tensorboard(writer, metrics=metrics, args=args)
@@ -115,7 +116,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                     plt.imshow(im)
             plt.show()"""
 
-        if mode == 'train':
+        if mode == 'train' and args.aux:
             image_batch = image_batch[0]
             labels_batch = labels_batch[0]
 
@@ -129,7 +130,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
 
         loss1 = criterion(last_output, labels_batch)
 
-        if mode == 'train':
+        if mode == 'train' and args.aux:
             l = aux_output.std(dim=0).data
             loss2 = torch.mean(l)
             loss = loss1 + loss2
@@ -165,6 +166,8 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
         metrics['epoch_time']))
 
     results = results.append({'mask_use': args.mask_use,
+                              'aux': args.aux,
+                              'aux_batch': args.aux_batch,
                               'freeze_mode': args.freezing,
                               'lr': args.lr,
                               'exp': args.N,
@@ -176,7 +179,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                               'loss': metrics['loss'],
                               'acc': metrics['accuracy'],
                               'prec': metrics['precision'],
-                              'f1':metrics['f1_score'],
+                              'f1': metrics['f1_score'],
                               'recall': metrics['recall']}, ignore_index=True)
 
     metric.reset()
