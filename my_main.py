@@ -47,7 +47,7 @@ if __name__ == "__main__":
     N = args.N
     learning_rates = args.lr
     freeze_modes = [False]
-    mask_use = [False]
+    mask_use = [True]
     cell = [True, False]
     cell_size = args.cell_size
     probs = args.prob
@@ -78,6 +78,7 @@ if __name__ == "__main__":
                                 for p in probs:
                                     args.prob = p
                                     for experiment in range(N):
+                                        print(args)
                                         args.N = experiment
                                         results, best_f1 = train(args, results, best_f1)
                                         print_save_results(args, results, root, i, time)
@@ -86,6 +87,7 @@ if __name__ == "__main__":
                             for p in probs:
                                 args.prob = p
                                 for experiment in range(N):
+                                    print(args)
                                     args.N = experiment
                                     results, best_f1 = train(args, results, best_f1)
                                     print_save_results(args, results, root, i, time)
