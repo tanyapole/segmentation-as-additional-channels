@@ -46,8 +46,9 @@ def train(args, results, best_f1):
 
     if args.resume:
         args.mask_use = False
+        print('resume')
         model, optimizer = create_model(args, device)
-        checkpoint = torch.load(args.model_path + 'model.pt')
+        checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
         input_num = 3 + len(args.attribute)
@@ -78,7 +79,7 @@ def train(args, results, best_f1):
                                                 args=args, device=device, criterion=criterion, optimizer=optimizer,
                                                 results=results, metric=metric, epoch=ep, scheduler=scheduler)
             #if metrics[0]['f1_score'] > best_f1:
-            if ep == 199:
+            if ep == 199 and not args.resume:
                 if args.resume:
                     name = '{}resume_model_{}.pt'.format(args.model_path, args.N)
                 else:
