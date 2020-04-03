@@ -192,12 +192,12 @@ def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion,
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
         loss1 = criterion(last_output, labels_batch)
-
         if mode == 'train':
             loss2 = 0
-            for i in range(args.batch_size):
+            for i in range(aux_output.shape[0]//args.aux_batch):
                 l = aux_output[i*args.aux_batch:(i+1)*args.aux_batch].std(dim=0).data
                 loss2 += torch.mean(l)
+
             loss = loss1 + loss2
             optimizer.zero_grad()
             loss.backward()
