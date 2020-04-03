@@ -26,7 +26,6 @@ if __name__ == "__main__":
     arg('--show_model', action='store_true')
     arg('--model_path', type=str, default='/Data/model/')
     arg('--prob', type=float, nargs='*', default=0.1)
-    arg('--jaccard_weight', type=float, default=0.)
     arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
     arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')

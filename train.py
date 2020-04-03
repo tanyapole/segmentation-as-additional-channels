@@ -46,7 +46,7 @@ def train(args, results, best_f1):
 
     if args.resume:
         args.mask_use = False
-        print('resume')
+        print('resume model_{}'.format(args.N))
         model, optimizer = create_model(args, device)
         checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
@@ -74,10 +74,16 @@ def train(args, results, best_f1):
         try:
             metrics = [0, 0]
             for i, mode in enumerate(['train', 'valid']):
-
-                metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id, mask_ind=mask_ind,
-                                                args=args, device=device, criterion=criterion, optimizer=optimizer,
-                                                results=results, metric=metric, epoch=ep, scheduler=scheduler)
+                if args.aux:
+                    metrics[i], results = make_step_aux(model=model, mode=mode, train_test_id=train_test_id,
+                                                        mask_ind=mask_ind, args=args, device=device,
+                                                        criterion=criterion, optimizer=optimizer, results=results,
+                                                        metric=metric, epoch=ep, scheduler=scheduler)
+                else:
+                    metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id,
+                                                    mask_ind=mask_ind, args=args, device=device, criterion=criterion,
+                                                    optimizer=optimizer, results=results, metric=metric, epoch=ep,
+                                                    scheduler=scheduler)
             #if metrics[0]['f1_score'] > best_f1:
             if ep == 199 and not args.resume:
                 if args.resume:
@@ -117,26 +123,14 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                     plt.imshow(im)
             plt.show()"""
 
-        if mode == 'train' and args.aux:
-            image_batch = image_batch[0]
-            labels_batch = labels_batch[0]
-
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-
+        last_output, _ = model(image_batch)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
-        last_output, aux_output = model(image_batch)
 
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
-        loss1 = criterion(last_output, labels_batch)
-
-        if mode == 'train' and args.aux:
-            l = aux_output.std(dim=0).data
-            loss2 = torch.mean(l)
-            loss = loss1 + loss2
-        else:
-            loss = loss1
+        loss = criterion(last_output, labels_batch)
 
         if mode == 'train':
             optimizer.zero_grad()
@@ -157,14 +151,90 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
         torch.set_grad_enabled(True)
         scheduler.step(loss)
 
+    results = print_update(metrics, results, args, mode)
+
+    metric.reset()
+
+    return metrics, results
+
+
+def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion, optimizer, results, metric, epoch,
+              scheduler):
+    start_time = time.time()
+    loader = make_loader(train_test_id, mask_ind, args, train=mode, shuffle=True)
+    n = len(loader)
+    if mode == 'valid':
+        torch.set_grad_enabled(False)
+    for i, (image_batch, labels_batch, names) in enumerate(loader):
+        if i == n - 1:
+            print(f'\r', end='')
+        elif i < n - 3:
+            print(f'\rBatch {i} / {n} ', end='')
+        """if i < 5 :
+            fig = plt.figure(figsize=(10, 10))
+            ax = []
+            for i, image in enumerate(image_batch):
+                for channel in range(3, image.shape[2]):
+                    im = image.cpu().numpy()[:, :, channel]
+                    ax.append(fig.add_subplot(len(image_batch), image.shape[2], i*(image.shape[2]-3)+channel-3 + 1))
+                    ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
+                    plt.imshow(im)
+            plt.show()"""
+        #print(image_batch.shape)
+        image_batch = image_batch.view(-1, *image_batch.shape[-3:]).permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
+        #print(image_batch.shape)
+        #print(labels_batch.shape)
+        labels_batch = labels_batch.view(-1, labels_batch.shape[-1]).to(device).type(torch.cuda.FloatTensor)
+        #print(labels_batch.shape)
+        last_output, aux_output = model(image_batch)
+
+        if isinstance(args.attribute, str):
+            labels_batch = torch.reshape(labels_batch, (-1, 1))
+
+        loss1 = criterion(last_output, labels_batch)
+
+        if mode == 'train':
+            loss2 = 0
+            for i in range(args.batch_size):
+                l = aux_output[i*args.aux_batch:(i+1)*args.aux_batch].std(dim=0).data
+                loss2 += torch.mean(l)
+            loss = loss1 + loss2
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+        else:
+            loss = loss1
+
+        outputs = torch.sigmoid(last_output)
+
+        outputs = np.around(outputs.data.cpu().numpy().ravel())
+        labels_batch = labels_batch.data.cpu().numpy().ravel()
+        metric.update(labels_batch, outputs)
+
+    epoch_time = time.time() - start_time
+
+    metrics = metric.compute(loss, epoch, epoch_time)
+
+    if mode == 'valid':
+        torch.set_grad_enabled(True)
+        scheduler.step(loss)
+
+    results = print_update(metrics, results, args, mode)
+
+    metric.reset()
+
+    return metrics, results
+
+
+def print_update(metrics, results, args, mode):
     print('Epoch: {} Loss: {:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} Time: {:.4f}'.format(
-        metrics['epoch'],
-        metrics['loss'],
-        metrics['accuracy'],
-        metrics['precision'],
-        metrics['recall'],
-        metrics['f1_score'],
-        metrics['epoch_time']))
+            metrics['epoch'],
+            metrics['loss'],
+            metrics['accuracy'],
+            metrics['precision'],
+            metrics['recall'],
+            metrics['f1_score'],
+            metrics['epoch_time']))
 
     results = results.append({'mask_use': args.mask_use,
                               'aux': args.aux,
@@ -176,13 +246,11 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
                               'cell_size': args.cell_size,
                               'prob': args.prob,
                               'train_mode': mode,
-                              'epoch': epoch,
+                              'epoch': metrics['epoch'],
                               'loss': metrics['loss'],
                               'acc': metrics['accuracy'],
                               'prec': metrics['precision'],
                               'f1': metrics['f1_score'],
                               'recall': metrics['recall']}, ignore_index=True)
 
-    metric.reset()
-
-    return metrics, results
+    return results
