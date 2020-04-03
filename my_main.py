@@ -50,7 +50,7 @@ if __name__ == "__main__":
     cell = [True, False]
     cell_size = args.cell_size
     probs = args.prob
-    time = datetime.datetime.now().strftime('%d %H:%M')
+    time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
 
     best_f1 = 0
