@@ -23,7 +23,7 @@ chmod u+x bash_scripts/prepare.sh
 ~~~~
 ## Experiments
 
-# First experiment. 2 classes without masks train.
+### First experiment. 2 classes without masks train.
 In this experiment model resnet50 is trained during 400 epochs 10 times using *2 image classes*: milia_like_cyst and pigment_network. After 200 epoch each time model weights are saved.
 1. Prepare data as it stated in "Data preporation" section
 2. Run shell prompt from root of the project.
@@ -37,7 +37,7 @@ chmod u+x bash_scripts/run_exp_base_train_2_class.sh
 ~~~~
 . Bash_scripts/run_exp_base_train_2_class.sh Data/h5/ model/
 ~~~~
-# Second experiment. Zeroing squares or whole masks.
+### Second experiment. Zeroing squares or whole masks.
 In this experiment model resnet50 is retrained during 200 epochs 10 times using 2 image classes: milia_like_cyst and pigment_network. After 200 epoch each time model weights are saved. Model uses saved weights from first experiment, so you can repeat it or download from https://github.com/CaptainFest/Trained_models to */model_folder_name/* folder. Retraining is running with fixed different parameters of cell or not zeroing, different cell sizes & different probabilities.
 1. Prepare data as it stated in "Data preporation" section
 2. Run shell prompt from root of the project.
@@ -51,7 +51,7 @@ chmod u+x bash_scripts/run_exp_resume_general.sh
 ~~~~
 . Bash_scripts/run_exp_resume_general.sh Data/h5/ model/
 ~~~~
-# Third experiment. Aux retrain
+### Third experiment. Aux retrain
 In this experiment model resnet50 is trained during 200 epochs 10 times using 2 image classes: milia_like_cyst and pigment_network. After 200 epoch each time model weights are saved. Model uses saved weights from first experiment, so you can repeat it or download from https://github.com/CaptainFest/Trained_models to */model_folder_name/* folder. Model resnet50 modificated so after output_size==28 auxiliary exit is added. And for all outputs from this exit auxiliary loss is computed as sum of std of each unique image in batch. 
 1. Prepare data as it stated in "Data preporation" section
 2. Run shell prompt from root of the project.
@@ -65,7 +65,7 @@ chmod u+x bash_scripts/run_exp_resume_aux.sh
 ~~~~
 . Bash_scripts/run_exp_base_train_2_class.sh Data/h5/ model/
 ~~~~
-# Forth experiment. All classes without masks train.
+### Forth experiment. All classes without masks train.
 In this experiment model resnet50 is trained during 400 epochs 10 times using *ALL* image classes. After 200 epoch each time model weights are saved.
 1. Prepare data as it stated in "Data preporation" section
 2. Run shell prompt from root of the project.
