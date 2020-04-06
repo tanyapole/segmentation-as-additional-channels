@@ -45,8 +45,6 @@ if __name__ == "__main__":
                                     'prob', 'train_mode', 'epoch', 'acc', 'f1', 'loss', 'prec', 'recall'])
     N = args.N
     learning_rates = args.lr
-    freeze_modes = [False]
-    mask_use = [True]
     cell = [True, False]
     cell_size = args.cell_size
     probs = args.prob
@@ -60,40 +58,40 @@ if __name__ == "__main__":
             args.lr = lr
             for experiment in range(N):
                 args.N = experiment
+                print(args)
                 results, best_f1 = train(args, results, best_f1)
                 print_save_results(args, results, root, i, time)
                 i += 1
     else:
-        for m_use in mask_use:
-            args.mask_use = m_use
-            for lr in learning_rates:
-                args.lr = lr
-                if m_use:
-                    for c in cell:
-                        args.cell = c
-                        if args.cell:
-                            for cs in cell_size:
-                                args.cell_size = cs
-                                for p in probs:
-                                    args.prob = p
-                                    for experiment in range(N):
-                                        print(args)
-                                        args.N = experiment
-                                        results, best_f1 = train(args, results, best_f1)
-                                        print_save_results(args, results, root, i, time)
-                                        i += 1
-                        else:
+        for lr in learning_rates:
+            args.lr = lr
+            if args.mask_use:
+                for c in cell:
+                    args.cell = c
+                    if args.cell:
+                        for cs in cell_size:
+                            args.cell_size = cs
                             for p in probs:
                                 args.prob = p
                                 for experiment in range(N):
-                                    print(args)
                                     args.N = experiment
+                                    print(args)
                                     results, best_f1 = train(args, results, best_f1)
                                     print_save_results(args, results, root, i, time)
                                     i += 1
-                else:
-                    for experiment in range(N):
-                        args.N = experiment
-                        results, best_f1 = train(args, results, best_f1)
-                        print_save_results(args, results, root, i, time)
-                        i += 1
+                    else:
+                        for p in probs:
+                            args.prob = p
+                            for experiment in range(N):
+                                print(args)
+                                args.N = experiment
+                                results, best_f1 = train(args, results, best_f1)
+                                print_save_results(args, results, root, i, time)
+                                i += 1
+            else:
+                for experiment in range(N):
+                    args.N = experiment
+                    print(args)
+                    results, best_f1 = train(args, results, best_f1)
+                    print_save_results(args, results, root, i, time)
+                    i += 1

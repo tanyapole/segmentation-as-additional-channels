@@ -86,10 +86,7 @@ def train(args, results, best_f1):
                                                     scheduler=scheduler)
             #if metrics[0]['f1_score'] > best_f1:
             if ep == 199 and not args.resume:
-                if args.resume:
-                    name = '{}resume_model_{}.pt'.format(args.model_path, args.N)
-                else:
-                    name = '{}model_{}.pt'.format(args.model_path, args.N)
+                name = '{}model_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, metrics, optimizer)
                 best_f1 = metrics[0]['f1_score']
             # write_tensorboard(writer, metrics=metrics, args=args)
