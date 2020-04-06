@@ -59,7 +59,7 @@ In this experiment model resnet50 is trained during 200 epochs 10 times using 2 
 ~~~~
 chmod u+x bash_scripts/run_exp_resume_aux.sh
 ~~~~
-4. To repeat first experiment run *run_exp_resume_aux.sh* with following parameters:
+4. To repeat third experiment run *run_exp_resume_aux.sh* with following parameters:
    1. *path/to/h5/files/*
    2. *path/to/saved/model/weights/*
 ~~~~
@@ -73,7 +73,7 @@ In this experiment model resnet50 is trained during 400 epochs 10 times using *A
 ~~~~
 chmod u+x bash_scripts/run_exp_base_train_all.sh
 ~~~~
-4. To repeat first experiment run *run_exp_base_train_all.sh* with following parameters:
+4. To repeat forth experiment run *run_exp_base_train_all.sh* with following parameters:
    1. *path/to/h5/files/*
    2. *path/where/to/save/model/*
 ~~~~
