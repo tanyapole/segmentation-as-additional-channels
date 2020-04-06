@@ -91,4 +91,10 @@ Also all results will be stored as csv file in the *'./Results/<start_day&time_o
 - [x] Refactor code
 - [x] Add bash scripts
 - [x] Add readmi with explanations
-- [ ] define thesis 
+- [x] define thesis 
+- [x] update readme & bash scripts
+- [ ] compute 4 experiment 
+- [ ] add graphics to the project
+- [ ] process results of 3rd experiment
+- [ ] write thesis text
+- [ ] write article
