@@ -138,11 +138,11 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
 
         outputs = np.around(outputs.data.cpu().numpy().ravel())
         labels_batch = labels_batch.data.cpu().numpy().ravel()
-        metric.update(labels_batch, outputs)
+        metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
 
     epoch_time = time.time() - start_time
 
-    metrics = metric.compute(loss, epoch, epoch_time)
+    metrics = metric.compute(epoch, epoch_time)
 
     if mode == 'valid':
         torch.set_grad_enabled(True)
@@ -189,8 +189,8 @@ def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion,
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
         loss1 = criterion(last_output, labels_batch)
+        loss2 = torch.Tensor([0])
         if mode == 'train':
-            loss2 = 0
             for i in range(aux_output.shape[0]//args.aux_batch):
                 l = aux_output[i*args.aux_batch:(i+1)*args.aux_batch].std(dim=0).data
                 loss2 += torch.mean(l)
@@ -206,11 +206,11 @@ def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion,
 
         outputs = np.around(outputs.data.cpu().numpy().ravel())
         labels_batch = labels_batch.data.cpu().numpy().ravel()
-        metric.update(labels_batch, outputs)
+        metric.update(labels_batch, outputs, loss, loss1, loss2)
 
     epoch_time = time.time() - start_time
 
-    metrics = metric.compute(loss, epoch, epoch_time)
+    metrics = metric.compute(epoch, epoch_time)
 
     if mode == 'valid':
         torch.set_grad_enabled(True)
@@ -245,6 +245,8 @@ def print_update(metrics, results, args, mode):
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
                               'loss': metrics['loss'],
+                              'bce_loss': metrics['bce_loss'],
+                              'std_loss': metrics['std_loss'],
                               'acc': metrics['accuracy'],
                               'prec': metrics['precision'],
                               'f1': metrics['f1_score'],
