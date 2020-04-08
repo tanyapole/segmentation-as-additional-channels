@@ -46,7 +46,7 @@ if __name__ == "__main__":
                                     'recall'])
     N = args.N
     learning_rates = args.lr
-    cell = [True, False]
+    cell = [False]
     cell_size = args.cell_size
     probs = args.prob
     time = datetime.datetime.now().strftime('%d_%H.%M')
