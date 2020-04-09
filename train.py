@@ -135,7 +135,9 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             optimizer.step()
 
         outputs = torch.sigmoid(last_output)
-
+        print(outputs)
+        print(labels_batch)
+        print(labels_batch.shape)
         outputs = np.around(outputs.data.cpu().numpy().ravel())
         labels_batch = labels_batch.data.cpu().numpy().ravel()
         metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))

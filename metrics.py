@@ -14,7 +14,8 @@ class Metrics:
 
     def update(self, y_true, y_pred, loss, bce_loss, std_loss):
 
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[1, 0]).ravel()
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
+        print(tn, fp, fn, tp)
         self.tp += tp
         self.fp += fp
         self.fn += fn
