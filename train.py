@@ -68,7 +68,7 @@ def train(args, results, best_f1):
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 
     writer = SummaryWriter()
-    metric = Metrics()
+    metric = Metrics(args)
 
     for ep in range(epoch, args.n_epochs):
         try:
@@ -138,8 +138,8 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
         print(labels_batch)
         print(labels_batch.shape)
         print(outputs)
-        outputs = np.around(outputs.data.cpu().numpy().ravel())
-        labels_batch = labels_batch.data.cpu().numpy().ravel()
+        outputs = np.around(outputs.data.cpu().numpy())
+        labels_batch = labels_batch.data.cpu().numpy()
         metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
 
     epoch_time = time.time() - start_time
