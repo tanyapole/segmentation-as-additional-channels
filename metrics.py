@@ -54,8 +54,8 @@ class Metrics:
                     'f1_score_labels': f1_l
                 }
 
-    def reset(self, args):
-        self.conf_matrix = np.zeros([args.attribute, 2, 2])
+    def reset(self):
+        self.conf_matrix = np.zeros([self.conf_matrix.shape[0], 2, 2])
         self.loss = []
         self.bce_loss = []
         self.std_loss = []
