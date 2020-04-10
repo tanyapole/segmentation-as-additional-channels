@@ -152,7 +152,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
 
     results = print_update(metrics, results, args, mode)
 
-    metric.reset(args)
+    metric.reset()
 
     return metrics, results
 
