@@ -250,8 +250,12 @@ def print_update(metrics, results, args, mode):
                               'bce_loss': metrics['bce_loss'],
                               'std_loss': metrics['std_loss'],
                               'acc': metrics['accuracy'],
+                              'acc_labels': metrics['accuracy_labels'],
                               'prec': metrics['precision'],
+                              'prec_labels': metrics['precision_labels'],
+                              'recall': metrics['recall'],
+                              'recall_labels': metrics['recall_labels'],
                               'f1': metrics['f1_score'],
-                              'recall': metrics['recall']}, ignore_index=True)
+                              'f1_labels': metrics['f1_score_labels']}, ignore_index=True)
 
     return results

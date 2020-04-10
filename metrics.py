@@ -5,7 +5,7 @@ import numpy as np
 class Metrics:
 
     def __init__(self, args):
-        self.conf_matrix = np.zeros([args.attribute, 2, 2])
+        self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
         self.loss = []
         self.bce_loss = []
         self.std_loss = []
@@ -25,11 +25,11 @@ class Metrics:
         for cm in self.conf_matrix:
             tn, fp, fn, tp = cm.ravel()
             acc_l.append((tp + tn) / (tp + tn + fp + fn))          # TP+TN/(TP+TN+FP+FN)
-            p = tp / (tp + fp)                                     # TP   /(TP+FP)
+            p = tp / (tp + fp + 1e-15)                             # TP   /(TP+FP)
             prec_l.append(p)
-            r = tp / (tp + fn)                                     # TP   /(TP+FN)
+            r = tp / (tp + fn + 1e-15)                             # TP   /(TP+FN)
             rec_l.append(r)
-            f1_l.append(2 * p * r / (p + r))                       # 2*PREC*REC/(PREC+REC)
+            f1_l.append(2 * p * r / (p + r + 1e-15))               # 2*PREC*REC/(PREC+REC)
         acc  = sum(acc_l) / len(acc_l)
         prec = sum(prec_l)/ len(prec_l)
         rec  = sum(rec_l) / len(rec_l)

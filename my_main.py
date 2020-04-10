@@ -41,9 +41,8 @@ if __name__ == "__main__":
     root.mkdir(exist_ok=True, parents=True)
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
-    results = pd.DataFrame(columns=['mask_use', 'aux', 'aux_batch', 'freeze_mode', 'lr', 'exp', 'cell', 'cell_size',
-                                    'prob', 'train_mode', 'epoch', 'acc', 'f1', 'loss', 'bce_loss', 'std_loss', 'prec',
-                                    'recall'])
+    results = pd.DataFrame()
+
     N = args.N
     learning_rates = args.lr
     cell = [True, False]
