@@ -226,14 +226,15 @@ def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion,
 
 
 def print_update(metrics, results, args, mode):
-    print('Epoch: {} Loss: {:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} Time: {:.4f}'.format(
-            metrics['epoch'],
-            metrics['loss'],
-            metrics['accuracy'],
-            metrics['precision'],
-            metrics['recall'],
-            metrics['f1_score'],
-            metrics['epoch_time']))
+    print('''Epoch: {} Loss: {:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
+             Time: {:.4f}'''.format(metrics['epoch'],
+                                    metrics['loss'],
+                                    metrics['accuracy'],
+                                    metrics['precision'],
+                                    metrics['recall'],
+                                    metrics['f1_score'],
+                                    metrics['f1_score_labels'],
+                                    metrics['epoch_time']))
 
     results = results.append({'mask_use': args.mask_use,
                               'aux': args.aux,
