@@ -85,7 +85,7 @@ def train(args, results, best_f1):
                                                     optimizer=optimizer, results=results, metric=metric, epoch=ep,
                                                     scheduler=scheduler)
             #if metrics[0]['f1_score'] > best_f1:
-            if ep == 199 and not args.resume:
+            if ep == 199 and args.save_model:
                 name = '{}model_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, metrics, optimizer)
                 best_f1 = metrics[0]['f1_score']

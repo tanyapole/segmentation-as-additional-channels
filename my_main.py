@@ -35,6 +35,7 @@ if __name__ == "__main__":
     arg('--resume', action='store_true')
     arg('--aux', action='store_true')
     arg('--aux_batch', type=int, default=4)
+    arg('--save_model', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)
