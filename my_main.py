@@ -20,13 +20,13 @@ if __name__ == "__main__":
     arg('--pretrained', action='store_true')           # if --pretrained parameter then True
     arg('--lr', type=float, nargs='*', default=[0.0001])
     arg('--batch_size', type=int, default=1)
-    arg('--augment_list', type=list, nargs='*', default=[])
+    arg('--augment_list', nargs='+', default=[])
     arg('--image_path', type=str, default='./Data/h5/')
     arg('--n_epochs', type=int, default=1)
     arg('--show_model', action='store_true')
     arg('--model_path', type=str, default='/Data/model/')
     arg('--prob', type=float, nargs='*', default=0.1)
-    arg('--attribute', type=str, nargs='*', default='attribute_pigment_network')
+    arg('--attribute', nargs='+', default=[])
     arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')
     arg('--cell', action='store_true')
@@ -42,10 +42,10 @@ if __name__ == "__main__":
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
     results = pd.DataFrame()
-
+    print(args.attribute)
     N = args.N
     learning_rates = args.lr
-    cell = [True, False]
+    cell = [False]
     cell_size = args.cell_size
     probs = args.prob
     time = datetime.datetime.now().strftime('%d_%H.%M')

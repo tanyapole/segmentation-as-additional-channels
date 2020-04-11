@@ -1,17 +1,22 @@
-from sklearn.metrics import multilabel_confusion_matrix
+from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import numpy as np
 
 
 class Metrics:
 
     def __init__(self, args):
+
         self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
         self.loss = []
         self.bce_loss = []
         self.std_loss = []
 
     def update(self, y_true, y_pred, loss, bce_loss, std_loss):
-        self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred, labels=[0,1])
+        if y_true.shape[1] == 1:
+            self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
+        else:
+            self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred)
+        print(self.conf_matrix)
         self.loss.append(loss.item())
         self.bce_loss.append(bce_loss.item())
         self.std_loss.append(std_loss.item())

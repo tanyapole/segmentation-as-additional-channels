@@ -64,9 +64,10 @@ class MyDataset(Dataset):
             angle = random.randint(0, 90)
             translate = (random.uniform(0, 100), random.uniform(0, 100))
             scale = random.uniform(0.5, 2)
-            image = TF.affine(image, angle, translate, scale)
+            shear = random.uniform(-10, 10)
+            image = TF.affine(image, angle, translate, scale, shear)
             for i in range(mask.shape[-1]):
-                mask_pil_array[i] = TF.affine(mask_pil_array[i], angle, translate, scale)
+                mask_pil_array[i] = TF.affine(mask_pil_array[i], angle, translate, scale, shear)
         if 'adjust_brightness' in self.augment_list:
             if random.random() > 0.3:
                 brightness_factor = random.uniform(0.8, 1.2)
