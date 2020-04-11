@@ -168,6 +168,9 @@ def create_model(args, device):
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
     model.to(device)
-    optimizer = SGD(model.parameters(), lr=args.lr, momentum=0.9, nesterov=True)
 
+    if args.optimizer == 'sgd':
+        optimizer = SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
+    elif args.optimizer == 'adam':
+        optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=0.0005)
     return model, optimizer
