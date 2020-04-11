@@ -38,6 +38,7 @@ if __name__ == "__main__":
     arg('--optimizer', type=str, choices=['adam', 'sgd'])
     arg('--save_model', action='store_true')
     arg('--pos_weight', action='store_true')
+    arg('--weights', type=float, nargs='*', default=[])
     args = parser.parse_args()
 
     root = Path(args.root)
