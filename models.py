@@ -130,12 +130,12 @@ def create_model(args, device):
 
     if args.model == 'vgg16':
         if args.pretrained:
-            if args.batch_normalization:
+            if args.batch_norm:
                 model = models.vgg16_bn(pretrained=True)
             else:
                 model = models.vgg16(pretrained=True)
         else:
-            if args.batch_normalization:
+            if args.batch_norm:
                 model = models.vgg16_bn()
             else:
                 model = models.vgg16()

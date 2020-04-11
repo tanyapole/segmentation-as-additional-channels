@@ -16,7 +16,7 @@ if __name__ == "__main__":
     arg('--mask_use', action='store_true')
     arg('--root', type=str, default='runs/debug')
     arg('--N', type=int, default=1)
-    arg('--batch_normalization', action='store_true')  # if --batch-normalization parameter then True
+    arg('--batch_norm', action='store_true')           # if --batch-normalization parameter then True
     arg('--pretrained', action='store_true')           # if --pretrained parameter then True
     arg('--lr', type=float, nargs='*', default=[0.0001])
     arg('--batch_size', type=int, default=1)

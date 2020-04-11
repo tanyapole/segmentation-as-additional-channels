@@ -130,7 +130,7 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
             plt.show()"""
 
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-        last_output, _ = model(image_batch)
+        last_output = model(image_batch)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
 
         if isinstance(args.attribute, str):
