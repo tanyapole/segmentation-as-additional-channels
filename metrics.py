@@ -16,7 +16,7 @@ class Metrics:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
             self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred)
-        #print(self.conf_matrix)
+        print(self.conf_matrix)
         self.loss.append(loss.item())
         self.bce_loss.append(bce_loss.item())
         self.std_loss.append(std_loss.item())

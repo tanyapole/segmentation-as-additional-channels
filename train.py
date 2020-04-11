@@ -63,7 +63,16 @@ def train(args, results, best_f1):
 
     model = nn.DataParallel(model)
 
-    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=None) # torch.Tensor([0.5, 1.0]).to(device)
+    if args.pos_weight:
+        w = {'attribute_globules': 1.5,
+             'attribute_milia_like_cyst': 1.5,
+             'attribute_negative_network': 2.,
+             'attribute_pigment_network': 0.4,
+             'attribute_streaks': 2.}
+        pos_weight = torch.Tensor([w[attr] for attr in args.attribute], device=device)
+    else:
+        pos_weight = None
+    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
 
     scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
 

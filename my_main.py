@@ -37,6 +37,7 @@ if __name__ == "__main__":
     arg('--aux_batch', type=int, default=4)
     arg('--optimizer', type=str, choices=['adam', 'sgd'])
     arg('--save_model', action='store_true')
+    arg('--pos_weight', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)
