@@ -69,7 +69,7 @@ def train(args, results, best_f1):
              'attribute_negative_network': args.weights[2],  # 1.5
              'attribute_pigment_network': args.weights[3],   # 0.4
              'attribute_streaks': args.weights[4]}           # 1.5
-        pos_weight = torch.Tensor([w[attr] for attr in args.attribute], device=device)
+        pos_weight = torch.Tensor([w[attr] for attr in args.attribute]).to(device)
     else:
         pos_weight = None
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
