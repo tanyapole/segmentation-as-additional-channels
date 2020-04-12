@@ -5,7 +5,7 @@ from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 from torch.backends import cudnn
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import MultiStepLR
 from pathlib import Path
 from loss import LossBinary
 from Utils.utils import write_tensorboard, save_weights
@@ -47,7 +47,7 @@ def train(args, results, best_f1):
     if args.resume:
         args.mask_use = False
         print('resume model_{}'.format(args.N))
-        model, optimizer = create_model(args, device)
+        model, optimizer = create_model(args)
         checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
@@ -74,7 +74,7 @@ def train(args, results, best_f1):
         pos_weight = None
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
 
-    scheduler = ReduceLROnPlateau(optimizer, 'min', factor=0.8, patience=10, verbose=True)
+    scheduler = MultiStepLR(optimizer, [60-1,120-1,160-1], gamma=0.2)
 
     writer = SummaryWriter()
     metric = Metrics(args)
