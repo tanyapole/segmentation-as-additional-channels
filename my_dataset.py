@@ -1,11 +1,11 @@
 import os
 import torchvision.transforms.functional as TF
-from keras.preprocessing.image import array_to_img, img_to_array
+#from keras.preprocessing.image import array_to_img, img_to_array
+from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from Utils.utils import load_image
 import random
 import numpy as np
-import torch
 
 
 class MyDataset(Dataset):
@@ -45,11 +45,10 @@ class MyDataset(Dataset):
         return self.n
 
     def transform_fn(self, image, mask):
-
-        image = array_to_img(image, data_format="channels_last")
+        image = Image.fromarray(image.astype('uint8'))
         mask_pil_array = [None] * mask.shape[-1]
         for i in range(mask.shape[-1]):
-            mask_pil_array[i] = array_to_img(mask[:, :, i, np.newaxis], data_format="channels_last")
+            mask_pil_array[i] = Image.fromarray(mask[:, :, i])
         if 'hflip' in self.augment_list:
             if random.random() > 0.5:
                 image = TF.hflip(image)
@@ -77,10 +76,10 @@ class MyDataset(Dataset):
                 saturation_factor = random.uniform(0.8, 1.2)
                 image = TF.adjust_saturation(image, saturation_factor)
 
-        image = img_to_array(image, data_format="channels_last")
+        image = np.array(image)
         if self.mask_use:
             for i in range(mask.shape[-1]):
-                mask[:, :, i] = img_to_array(mask_pil_array[i], data_format="channels_last")[:, :, 0].astype('uint8')
+                mask[:, :, i] = np.array(mask_pil_array[i])[:, :, 0].astype('uint8')
 
         image = (image / 255.0).astype('float32')
         mask = (mask / 255.0).astype('uint8')

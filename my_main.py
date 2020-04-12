@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     arg = parser.add_argument
-    arg('--model', type=str, default='vgg16', choices=['vgg16', 'resnet50', 'resnet152', 'resnext50'])
+    arg('--model', type=str, default='vgg16', choices=['vgg16', 'resnet50', 'resnext101', 'resnext50'])
     arg('--mask_use', action='store_true')
     arg('--root', type=str, default='runs/debug')
     arg('--N', type=int, default=1)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
     results = pd.DataFrame()
-    print(args.attribute)
+
     N = args.N
     learning_rates = args.lr
     cell = [False]

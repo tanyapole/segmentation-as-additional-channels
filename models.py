@@ -1,21 +1,30 @@
 from torch import nn
 from torchvision import models
 from torch.optim import Adam, SGD
-from torchvision.models.resnet import model_urls, conv1x1, conv3x3
+from torchvision.models.resnet import model_urls, conv1x1
+from torchvision.models import resnext101_32x8d
 from torch.utils.model_zoo import load_url as load_state_dict_from_url
 import torch
 
 
+def conv3x3(in_planes, out_planes, stride=1, groups=1):
+    """3x3 convolution with padding"""
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
+                     groups=groups, bias=False)
+
 class Bottleneck(nn.Module):
     expansion = 4
+    __constants__ = ['downsample']
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inplanes, planes, stride=1, downsample=None, groups=1, base_width=64):
+        print(groups)
         super(Bottleneck, self).__init__()
-        self.conv1 = conv1x1(inplanes, planes)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = conv3x3(planes, planes, stride)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = conv1x1(planes, planes * self.expansion)
+        width = int(planes * (base_width / 64.)) * groups
+        self.conv1 = conv1x1(inplanes, width)
+        self.bn1 = nn.BatchNorm2d(width)
+        self.conv2 = conv3x3(width, width, stride=stride, groups=groups)
+        self.bn2 = nn.BatchNorm2d(width)
+        self.conv3 = conv1x1(width, planes * self.expansion)
         self.bn3 = nn.BatchNorm2d(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
@@ -37,7 +46,8 @@ class Bottleneck(nn.Module):
 
         if self.downsample is not None:
             identity = self.downsample(x)
-
+        print(out.shape)
+        print(identity.shape)
         out += identity
         out = self.relu(out)
 
@@ -46,11 +56,13 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, zero_init_residual=False):
+    def __init__(self, block, layers, num_classes=1000, zero_init_residual=False,
+                 groups=1, width_per_group=64):
         super(ResNet, self).__init__()
 
         self.inplanes = 64
-
+        self.groups = groups
+        self.base_width = width_per_group
         self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
@@ -88,10 +100,12 @@ class ResNet(nn.Module):
             )
 
         layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
+        layers.append(block(inplanes=self.inplanes, planes=planes, stride=stride, downsample=downsample,
+                            groups=self.groups, base_width=self.base_width))
         self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
+            layers.append(block(inplanes=self.inplanes, planes=planes,
+                                groups=self.groups, base_width=self.base_width))
 
         return nn.Sequential(*layers)
 
@@ -129,21 +143,16 @@ def _resnet(arch, block, layers, pretrained, progress, **kwargs):
 def create_model(args, device):
 
     if args.model == 'vgg16':
-        if args.pretrained:
-            if args.batch_norm:
-                model = models.vgg16_bn(pretrained=True)
-            else:
-                model = models.vgg16(pretrained=True)
+        if args.batch_norm:
+            model = models.vgg16_bn(pretrained=args.pretrained)
         else:
-            if args.batch_norm:
-                model = models.vgg16_bn()
-            else:
-                model = models.vgg16()
+            model = models.vgg16(pretrained=args.pretrained)
     elif args.model == 'resnet50':
-        if args.pretrained:
-            model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=True, progress=True)
-        else:
-            model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=False, progress=True)
+        model = _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained=args.pretrained, progress=True)
+    elif args.model =='resnext101':
+        #model = _resnet('resnext101_32x8d', Bottleneck, [3, 4, 23, 3], pretrained=args.pretrained, progress=True,
+        #                groups=32, width_per_group=8)
+        model = resnext101_32x8d(pretrained=args.pretrained)
     else:
         return
 
@@ -159,7 +168,7 @@ def create_model(args, device):
         out_shape = len(args.attribute)
 
     # channels replacement
-    if args.model in ['resnet50', 'resnet152']:
+    if args.model in ['resnet50', 'resnext101']:
         model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         last_layer_in_channels = model.fc.in_features
         model.fc = nn.Linear(last_layer_in_channels, out_shape)
