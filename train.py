@@ -56,13 +56,13 @@ def train(args, results, best_f1):
             model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         args.mask_use = True
     else:
-        model, optimizer = create_model(args, device)
+        model, optimizer = create_model(args)
 
     if args.show_model:
         print(model)
 
     model = nn.DataParallel(model)
-
+    model.to(device)
     if args.pos_weight:
         w = {'attribute_globules': args.weights[0],          # 1.2
              'attribute_milia_like_cyst': args.weights[1],   # 1.2

@@ -140,7 +140,7 @@ def _resnet(arch, block, layers, pretrained, progress, **kwargs):
 
 
 
-def create_model(args, device):
+def create_model(args):
 
     if args.model == 'vgg16':
         if args.batch_norm:
@@ -176,7 +176,7 @@ def create_model(args, device):
         model.features[0] = nn.Conv2d(input_num, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
-    model.to(device)
+    # model.to(device)
 
     if args.optimizer == 'sgd':
         optimizer = SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
