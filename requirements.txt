@@ -1,7 +1,4 @@
 h5py==2.10.0
-Keras==2.2.4
-Keras-Preprocessing==1.1.0
-Keras-Applications==1.0.8
 numpy==1.18.1
 opencv-python==4.1.0.25
 pandas==0.24.2
@@ -10,9 +7,8 @@ scikit-learn==0.20.3
 scipy==1.4.1
 tensorboard==1.14.0
 tensorboardX==1.6
-tensorflow==1.14.0
-torch==1.0.1
-torchvision==0.2.2
+torch==1.4.0
+torchvision==0.5.0
 
 # tested on
 # cuda toolkit 10.1
