@@ -38,7 +38,7 @@ def train(args, results, best_f1):
     print('--' * 10)"""
 
     cudnn.benchmark = True
-    torch.set_default_tensor_type(torch.cuda.FloatTensor)
+    #torch.set_default_tensor_type(torch.cuda.FloatTensor)
 
     device = 'cuda'
     if args.cuda1:
