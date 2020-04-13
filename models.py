@@ -2,7 +2,7 @@ from torch import nn
 from torchvision import models
 from torch.optim import Adam, SGD
 from torchvision.models.resnet import model_urls, conv1x1
-#from torchvision.models import resnext101_32x8d
+from torchvision.models import resnext101_32x8d
 from torch.utils.model_zoo import load_url as load_state_dict_from_url
 import torch
 
@@ -176,10 +176,9 @@ def create_model(args):
         model.features[0] = nn.Conv2d(input_num, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
-    # model.to(device)
 
     if args.optimizer == 'sgd':
         optimizer = SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
     elif args.optimizer == 'adam':
-        optimizer = Adam(model.parameters(), lr=args.lr, weight_decay=0.0005)
+        optimizer = Adam(model.parameters(), lr=args.lr)
     return model, optimizer
