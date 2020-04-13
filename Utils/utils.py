@@ -7,16 +7,9 @@ import os
 import sys
 
 
-def load_image(file_name, type='image'):
+def load_image(file_name):
     f = h5py.File(file_name, 'r')
     file_np = f['img'][()]
-    if type == 'image':
-        file_np = (file_np / 255.0).astype('float32')
-    elif type == 'mask':
-        file_np = file_np.astype('uint8')
-    else:
-        print('not choosed type to load')
-        return
     return file_np
 
 

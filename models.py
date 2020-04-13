@@ -2,7 +2,7 @@ from torch import nn
 from torchvision import models
 from torch.optim import Adam, SGD
 from torchvision.models.resnet import model_urls, conv1x1
-from torchvision.models import resnext101_32x8d
+#from torchvision.models import resnext101_32x8d
 from torch.utils.model_zoo import load_url as load_state_dict_from_url
 import torch
 

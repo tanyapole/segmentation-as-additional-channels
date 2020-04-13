@@ -25,7 +25,7 @@ if __name__ == "__main__":
     arg('--n_epochs', type=int, default=1)
     arg('--show_model', action='store_true')
     arg('--model_path', type=str, default='/Data/model/')
-    arg('--prob', type=float, nargs='*', default=0.1)
+    arg('--prob', type=float, nargs='*', default=[0.1])
     arg('--attribute', nargs='+', default=[])
     arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')

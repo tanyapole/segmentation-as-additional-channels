@@ -21,11 +21,13 @@ def train(args, results, best_f1):
     root = Path(args.root)
     root.mkdir(exist_ok=True, parents=True)
 
-    train_test_id = pd.read_csv('Data/train_test_id.csv')
-    mask_ind = pd.read_csv('Data/mask_ind.csv')
+    train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
+    train_test_id = train_test_id.sample(frac=1).reset_index(drop=True)
+    train_test_id.loc[:1900, 'Split'] = 'train'
+    train_test_id.loc[1900:, 'Split'] = 'valid'
 
     # uncomment for debugging
-    """train_loader = make_loader(train_test_id, mask_ind, args, annotated, train='train', shuffle=True)
+    """train_loader = make_loader(train_test_id, args, annotated, train='train', shuffle=True)
     print('--' * 10)
     print('check data')
     train_image, train_labels_ind, name = next(iter(train_loader))
@@ -38,7 +40,6 @@ def train(args, results, best_f1):
     print('--' * 10)"""
 
     cudnn.benchmark = True
-    #torch.set_default_tensor_type(torch.cuda.FloatTensor)
 
     device = 'cuda'
     if args.cuda1:
@@ -85,12 +86,12 @@ def train(args, results, best_f1):
             for i, mode in enumerate(['train', 'valid']):
                 if args.aux:
                     metrics[i], results = make_step_aux(model=model, mode=mode, train_test_id=train_test_id,
-                                                        mask_ind=mask_ind, args=args, device=device,
+                                                        args=args, device=device,
                                                         criterion=criterion, optimizer=optimizer, results=results,
                                                         metric=metric, epoch=ep, scheduler=scheduler)
                 else:
                     metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id,
-                                                    mask_ind=mask_ind, args=args, device=device, criterion=criterion,
+                                                    args=args, device=device, criterion=criterion,
                                                     optimizer=optimizer, results=results, metric=metric, epoch=ep,
                                                     scheduler=scheduler)
             #if metrics[0]['f1_score'] > best_f1:
@@ -106,10 +107,10 @@ def train(args, results, best_f1):
     return results, best_f1
 
 
-def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, optimizer, results, metric, epoch,
+def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch,
               scheduler):
     start_time = time.time()
-    loader = make_loader(train_test_id, mask_ind, args, train=mode, shuffle=True)
+    loader = make_loader(train_test_id, args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':
         torch.set_grad_enabled(False)
@@ -166,10 +167,10 @@ def make_step(model, mode, train_test_id, mask_ind, args, device, criterion, opt
     return metrics, results
 
 
-def make_step_aux(model, mode, train_test_id, mask_ind, args, device, criterion, optimizer, results, metric, epoch,
+def make_step_aux(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch,
               scheduler):
     start_time = time.time()
-    loader = make_loader(train_test_id, mask_ind, args, train=mode, shuffle=True)
+    loader = make_loader(train_test_id, args=args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':
         torch.set_grad_enabled(False)
