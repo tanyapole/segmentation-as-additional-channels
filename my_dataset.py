@@ -60,7 +60,6 @@ class MyDataset(Dataset):
                     #mask_pil_array_dupl[i] = TF.hflip(mask_pil_array_dupl[i])
         for i in range(mask.shape[-1]):
             mask[:, :, i] = np.array(mask_pil_array[i])
-        print(np.unique(mask), 'middle')
         if 'affine' in self.augment_list:
             angle = random.randint(0, 90)
             translate = (random.uniform(0, 100), random.uniform(0, 100))
@@ -141,7 +140,6 @@ class MyDataset(Dataset):
             plt.imshow(im)
         plt.show()"""
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
-        print(labels, 'lab', index)
         if self.aux and self.mask_use:
             im, l = np.array([]), np.array([])
             if self.train == 'train':
