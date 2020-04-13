@@ -1,18 +1,16 @@
 import os
 import torchvision.transforms.functional as TF
-#from keras.preprocessing.image import array_to_img, img_to_array
 from torch.utils.data import Dataset, DataLoader
 from Utils.utils import load_image
 import random
 import numpy as np
-import torch
 
 
 class MyDataset(Dataset):
 
     def __init__(self, train_test_id, args, train):
 
-        self.train_test_id = train_test_id[train_test_id['Split'] == train]
+        self.train_test_id = train_test_id[train_test_id['Split'] == train].reset_index(drop=True)
         self.image_path = args.image_path
         self.pretrained = args.pretrained
         self.attribute = args.attribute
@@ -20,9 +18,6 @@ class MyDataset(Dataset):
         self.augment_list = args.augment_list
         self.prob = args.prob
         self.train = train
-        self.all_attributes = ['attribute_globules', 'attribute_milia_like_cyst', 'attribute_negative_network',
-                               'attribute_pigment_network', 'attribute_streaks']
-
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.aux = args.aux
@@ -139,6 +134,7 @@ class MyDataset(Dataset):
             ax[mask.shape[2] + channel].set_title(name[5:]+str(np.unique(im)))
             plt.imshow(im)
         plt.show()"""
+
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
         if self.aux and self.mask_use:
             im, l = np.array([]), np.array([])
