@@ -73,7 +73,7 @@ class MyDataset(Dataset):
             if random.random() < 0.3:
                 saturation_factor = random.uniform(0.8, 1.2)
                 image = TF.adjust_saturation(image, saturation_factor)
-
+        #image.show()
         image = np.array(image)
 
         if self.mask_use:
@@ -82,14 +82,9 @@ class MyDataset(Dataset):
                 #mask_dupl[:, :, i] = np.array(mask_pil_array[i])
 
         #print(np.unique(mask), 'after1')
-        image = (image / 255.0)
         mask[mask==0] = -1
         #print(np.unique(mask), 'after2')
-        if self.pretrained:
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
-            image = (image - mean)/std
-        #return
+
         return image, mask
 
     def __getitem__(self, index):
@@ -108,6 +103,13 @@ class MyDataset(Dataset):
         if self.train == 'train':
             if self.augment_list:
                 image, mask = self.transform_fn(image, mask)
+        image = (image / 255.0)
+        if self.pretrained:
+            mean = np.array([0.485, 0.456, 0.406])
+            std = np.array([0.229, 0.224, 0.225])
+            image = (image - mean) / std
+        # print(np.unique(image))
+
         """fig = plt.figure(figsize=(5, 5))
         ax = []
         for channel in range(mask.shape[2]):

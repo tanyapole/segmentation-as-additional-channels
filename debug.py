@@ -24,11 +24,10 @@ def train(args, results):
     root = Path(args.root)
     root.mkdir(exist_ok=True, parents=True)
 
-    train_test_id = pd.read_csv('Data/train_test_id.csv')
-    mask_ind = pd.read_csv('Data/mask_ind.csv')
+    train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
 
     # uncomment for debugging
-    train_loader = make_loader(train_test_id, mask_ind, args, train='train', shuffle=True)
+    train_loader = make_loader(train_test_id, args, train='train', shuffle=True)
     print('--' * 10)
     print('check data')
     train_image, train_labels_ind, name = next(iter(train_loader))
