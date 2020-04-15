@@ -1,7 +1,5 @@
 import json
 import h5py
-import torch
-import pandas as pd
 import os
 
 
@@ -12,7 +10,8 @@ def load_image(file_name):
 
 
 def print_save_results(args, results, root, i, time):
-    print('Модель {}, заморозка {}, шаг обучения {}, номер эксперимента {}'.format(args.model, args.freezing, args.lr, args.N))
+    print('Модель {}, предобучение {}, заморозка {}, шаг обучения {}, номер эксперимента {}'.format(args.model,
+            args.pretrained, args.freezing, args.lr, args.N))
     root.joinpath('params_{}_num_{}.json'.format(time, i)).write_text(
         json.dumps(vars(args), indent=True, sort_keys=True))
     path = 'Results/{}'.format(time)
@@ -21,49 +20,3 @@ def print_save_results(args, results, root, i, time):
     if not os.path.exists(path):
         os.mkdir(path)
     results.to_csv(file, index=False)
-
-
-def write_tensorboard(writer, metrics, args):
-
-    train_metrics, valid_metrics = metrics
-    writer.add_scalars('loss', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): train_metrics['loss'],
-                                'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): valid_metrics['loss']},
-                       train_metrics['epoch'])
-
-    writer.add_scalars('precision', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): train_metrics['precision'],
-                                     'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): valid_metrics['precision']},
-                       train_metrics['epoch'])
-
-    writer.add_scalars('recall', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): train_metrics['recall'],
-                                  'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): valid_metrics['recall']},
-                       train_metrics['epoch'])
-
-    writer.add_scalars('accuracy', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): train_metrics['accuracy'],
-                                    'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                        args.N, args.lr): valid_metrics['accuracy']},
-                       train_metrics['epoch'])
-
-    writer.add_scalars('f1 score', {'train/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                                                                     args.N, args.lr): train_metrics[
-        'f1_score'],
-                                    'valid/mask{}/freeze{}/experiment{}/lr{}'.format(args.mask_use, args.freezing,
-                                                                                     args.N, args.lr): valid_metrics[
-                                        'f1_score']},
-                       train_metrics['epoch'])
-
-
-def save_weights(model, model_path, metrics, optimizer):
-    torch.save({'model': model.module.state_dict(),
-                'epoch_time': metrics[0]['epoch'],
-                'valid_loss': metrics[1]['loss'],
-                'train_loss': metrics[0]['loss'],
-                'optimizer': optimizer.state_dict()},
-               str(model_path)
-               )
