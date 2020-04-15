@@ -6,6 +6,7 @@ from train import train
 import datetime
 from Utils.utils import print_save_results
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import random
 
 
 if __name__ == "__main__":
@@ -54,7 +55,8 @@ if __name__ == "__main__":
     probs = args.prob
     time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
-
+    r = random.Random(0)
+    SEED_LIST = [r.randint(1, 500) for _ in range(10)]
     best_f1 = 0
 
     if args.aux:
@@ -80,7 +82,7 @@ if __name__ == "__main__":
                                 for experiment in range(N):
                                     args.N = experiment
                                     print(args)
-                                    results, best_f1 = train(args, results, best_f1)
+                                    results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
                                     print_save_results(args, results, root, i, time)
                                     i += 1
                     else:
@@ -89,13 +91,13 @@ if __name__ == "__main__":
                             for experiment in range(N):
                                 print(args)
                                 args.N = experiment
-                                results, best_f1 = train(args, results, best_f1)
+                                results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
                                 print_save_results(args, results, root, i, time)
                                 i += 1
             else:
                 for experiment in range(N):
                     args.N = experiment
                     print(args)
-                    results, best_f1 = train(args, results, best_f1)
+                    results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
                     print_save_results(args, results, root, i, time)
                     i += 1

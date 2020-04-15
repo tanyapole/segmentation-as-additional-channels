@@ -12,9 +12,10 @@ from Utils.utils import write_tensorboard, save_weights
 from my_dataset import make_loader
 from models import create_model
 from metrics import Metrics
+import random
 
 
-def train(args, results, best_f1):
+def train(args, results, best_f1, seed):
 
     epoch = 0
 
@@ -22,7 +23,11 @@ def train(args, results, best_f1):
     root.mkdir(exist_ok=True, parents=True)
 
     train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
-    train_test_id = train_test_id.sample(frac=1).reset_index(drop=True)
+    indexes = np.arange(train_test_id.shape[0])
+    random.seed(seed)
+    random.shuffle(indexes)
+    train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
+    #train_test_id = train_test_id.sample(frac=1).reset_index(drop=True)
     train_test_id.loc[:1900, 'Split'] = 'train'
     train_test_id.loc[1900:, 'Split'] = 'valid'
 
@@ -137,21 +142,22 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
-        loss = criterion(last_output, labels_batch)
+        outputs = nn.Sigmoid()(last_output)
+        #loss = criterion(last_output, labels_batch)
+        loss = nn.BCELoss()(outputs, labels_batch)
 
         if mode == 'train':
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-        outputs = torch.sigmoid(last_output)
         #print(labels_batch)
         #print(outputs)
         outputs = np.around(outputs.data.cpu().numpy())
         labels_batch = labels_batch.data.cpu().numpy()
         #print(outputs, labels_batch)
         metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
-
+    return
     epoch_time = time.time() - start_time
 
     metrics = metric.compute(epoch, epoch_time)
@@ -199,6 +205,8 @@ def make_step_aux(model, mode, train_test_id, args, device, criterion, optimizer
 
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
+
+        outputs = torch.sigmoid(last_output)
 
         loss1 = criterion(last_output, labels_batch)
         loss2 = torch.Tensor([0])
