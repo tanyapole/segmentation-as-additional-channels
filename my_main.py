@@ -40,7 +40,6 @@ if __name__ == "__main__":
 
     N = args.N
 
-    probs = args.prob
     time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
     r = random.Random(0)
