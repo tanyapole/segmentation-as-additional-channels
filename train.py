@@ -25,8 +25,8 @@ def train(args, results, best_f1, seed):
     random.shuffle(indexes)
     train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
     #train_test_id = train_test_id.sample(frac=1).reset_index(drop=True)
-    train_test_id.loc[:1900, 'Split'] = 'train'
-    train_test_id.loc[1900:, 'Split'] = 'valid'
+    train_test_id.loc[:1800, 'Split'] = 'train'
+    train_test_id.loc[1800:, 'Split'] = 'valid'
 
     # uncomment for debugging
     """train_loader = make_loader(train_test_id, args, annotated, train='train', shuffle=True)
@@ -55,16 +55,7 @@ def train(args, results, best_f1, seed):
     model = nn.DataParallel(model)
     model.to(device)
 
-    if args.pos_weight:
-        w = {'attribute_globules': args.weights[0],          # 1.2
-             'attribute_milia_like_cyst': args.weights[1],   # 1.2
-             'attribute_negative_network': args.weights[2],  # 1.5
-             'attribute_pigment_network': args.weights[3],   # 0.4
-             'attribute_streaks': args.weights[4]}           # 1.5
-        pos_weight = torch.Tensor([w[attr] for attr in args.attribute]).to(device)
-    else:
-        pos_weight = None
-    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
+    criterion = torch.nn.BCEWithLogitsLoss()
 
     writer = SummaryWriter()
     metric = Metrics(args)
@@ -84,8 +75,7 @@ def train(args, results, best_f1, seed):
     return results, best_f1
 
 
-def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch,
-              scheduler):
+def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch):
     start_time = time.time()
     loader = make_loader(train_test_id, args, train=mode, shuffle=True)
     n = len(loader)
@@ -96,17 +86,6 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             print(f'\r', end='')
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
-        """if i < 5 :
-            fig = plt.figure(figsize=(10, 10))
-            ax = []
-            for i, image in enumerate(image_batch):
-                for channel in range(3, image.shape[2]):
-                    im = image.cpu().numpy()[:, :, channel]
-                    ax.append(fig.add_subplot(len(image_batch), image.shape[2], i*(image.shape[2]-3)+channel-3 + 1))
-                    ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
-                    plt.imshow(im)
-            plt.show()"""
-
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
         last_output = model(image_batch)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
@@ -123,23 +102,18 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             loss.backward()
             optimizer.step()
 
-        #print(labels_batch)
-        #print(outputs)
         outputs = np.around(outputs.data.cpu().numpy())
         labels_batch = labels_batch.data.cpu().numpy()
         #print(outputs, labels_batch)
         metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
 
     epoch_time = time.time() - start_time
-
     metrics = metric.compute(epoch, epoch_time)
 
     if mode == 'valid':
         torch.set_grad_enabled(True)
-        scheduler.step(loss)
 
     results = print_update(metrics, results, args, mode)
-
     metric.reset()
 
     return metrics, results
@@ -156,20 +130,12 @@ def print_update(metrics, results, args, mode):
                                     metrics['f1_score_labels'],
                                     metrics['epoch_time']))
 
-    results = results.append({'mask_use': args.mask_use,
-                              'aux': args.aux,
-                              'aux_batch': args.aux_batch,
-                              'freeze_mode': args.freezing,
+    results = results.append({'model': args.model,
                               'lr': args.lr,
                               'exp': args.N,
-                              'cell': args.cell,
-                              'cell_size': args.cell_size,
-                              'prob': args.prob,
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
                               'loss': metrics['loss'],
-                              'bce_loss': metrics['bce_loss'],
-                              'std_loss': metrics['std_loss'],
                               'acc': metrics['accuracy'],
                               'acc_labels': metrics['accuracy_labels'],
                               'prec': metrics['precision'],

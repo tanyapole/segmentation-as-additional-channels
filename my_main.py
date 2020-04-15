@@ -19,7 +19,7 @@ if __name__ == "__main__":
     arg('--N', type=int, default=1)
     arg('--batch_norm', action='store_true')           # if --batch-normalization parameter then True
     arg('--pretrained', action='store_true')           # if --pretrained parameter then True
-    arg('--lr', type=float, nargs='*', default=0.0001)
+    arg('--lr', type=float)
     arg('--batch_size', type=int, default=1)
     arg('--image_path', type=str, default='./Data/h5/')
     arg('--n_epochs', type=int, default=1)
