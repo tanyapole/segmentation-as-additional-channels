@@ -24,6 +24,8 @@ if __name__ == "__main__":
     arg('--image_path', type=str, default='./Data/h5/')
     arg('--n_epochs', type=int, default=1)
     arg('--show_model', action='store_true')
+    arg('--save_model', action='store_true')
+    arg('--model_path', type=str, default='/data/ISIC/models/')
     arg('--attribute', nargs='+', default=[])
     arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')
@@ -43,11 +45,10 @@ if __name__ == "__main__":
     i = 0
     r = random.Random(0)
     SEED_LIST = [r.randint(1, 500) for _ in range(10)]
-    best_f1 = 0
 
     for experiment in range(N):
         args.N = experiment
         print(args)
-        results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
+        results = train(args, results, seed=SEED_LIST[experiment])
         print_save_results(args, results, root, i, time)
         i += 1

@@ -1,7 +1,7 @@
 import json
 import h5py
 import os
-
+import torch
 
 def load_image(file_name):
     f = h5py.File(file_name, 'r')
@@ -20,3 +20,13 @@ def print_save_results(args, results, root, i, time):
     if not os.path.exists(path):
         os.mkdir(path)
     results.to_csv(file, index=False)
+
+
+def save_weights(model, model_path, metrics, optimizer):
+    torch.save({'model': model.module.state_dict(),
+                'epoch_time': metrics[0]['epoch'],
+                'valid_loss': metrics[1]['loss'],
+                'train_loss': metrics[0]['loss'],
+                'optimizer': optimizer.state_dict()},
+               str(model_path)
+               )

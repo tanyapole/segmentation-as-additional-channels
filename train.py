@@ -9,10 +9,11 @@ from pathlib import Path
 from my_dataset import make_loader
 from models import create_model
 from metrics import Metrics
+from Utils.utils import save_weights
 import random
 
 
-def train(args, results, best_f1, seed):
+def train(args, results, seed):
 
     epoch = 0
 
@@ -59,7 +60,7 @@ def train(args, results, best_f1, seed):
 
     writer = SummaryWriter()
     metric = Metrics(args)
-
+    best_f1 = 10 ** 8
     for ep in range(epoch, args.n_epochs):
         try:
             metrics = [0, 0]
@@ -67,12 +68,17 @@ def train(args, results, best_f1, seed):
                 metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id,
                                                 args=args, device=device, criterion=criterion,
                                                 optimizer=optimizer, results=results, metric=metric, epoch=ep)
-            # write_tensorboard(writer, metrics=metrics, args=args)
+
+            if args.save_model and ep < 100:
+                if metrics[0]['loss'] < best_f1:
+                    name = '{}model_{}.pt'.format(args.model_path, args.N)
+                    save_weights(model, name, metrics, optimizer)
+                    best_f1 = metrics[0]['loss']
 
         except KeyboardInterrupt:
             return
     writer.close()
-    return results, best_f1
+    return results
 
 
 def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch):
