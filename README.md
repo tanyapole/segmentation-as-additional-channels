@@ -24,7 +24,7 @@ chmod u+x bash_scripts/prepare.sh
 ## Experiments
 
 ### First experiment. 5 classes without masks train.
-In this experiment model resnet50 is trained during 100 epochs 10 times using *5 image classes*: milia_like_cyst and pigment_network.
+In this experiment model resnet50 is trained during 100 epochs 10 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
 1. Prepare data as it stated in "Data preporation" section
 2. Run shell prompt from root of the project.
 3. Execute command to make the script runnable for you
