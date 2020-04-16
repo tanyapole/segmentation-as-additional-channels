@@ -7,8 +7,7 @@ import torch.nn as nn
 from torch.backends import cudnn
 from torch.optim.lr_scheduler import MultiStepLR
 from pathlib import Path
-from loss import LossBinary
-from Utils.utils import write_tensorboard, save_weights
+from Utils.utils import save_weights
 from my_dataset import make_loader
 from models import create_model
 from metrics import Metrics
@@ -27,7 +26,7 @@ def train(args, results, best_f1, seed):
     random.seed(seed)
     random.shuffle(indexes)
     train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
-    #train_test_id = train_test_id.sample(frac=1).reset_index(drop=True)
+
     train_test_id.loc[:1900, 'Split'] = 'train'
     train_test_id.loc[1900:, 'Split'] = 'valid'
 
@@ -50,19 +49,7 @@ def train(args, results, best_f1, seed):
     if args.cuda1:
         device = 'cuda:1'
 
-    if args.resume:
-        args.mask_use = False
-        print('resume model_{}'.format(args.N))
-        model, optimizer = create_model(args)
-        checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
-        input_num = 3 + len(args.attribute)
-        if args.model == 'resnet50':
-            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-        args.mask_use = True
-    else:
-        model, optimizer = create_model(args)
+    model, optimizer = create_model(args)
 
     if args.show_model:
         print(model)
@@ -80,7 +67,7 @@ def train(args, results, best_f1, seed):
         pos_weight = None
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
 
-    scheduler = MultiStepLR(optimizer, [60-1,120-1,160-1], gamma=0.2)
+    scheduler = MultiStepLR(optimizer, [50-1,100-1,140-1,180-1], gamma=0.2)
 
     writer = SummaryWriter()
     metric = Metrics(args)
@@ -89,22 +76,15 @@ def train(args, results, best_f1, seed):
         try:
             metrics = [0, 0]
             for i, mode in enumerate(['train', 'valid']):
-                if args.aux:
-                    metrics[i], results = make_step_aux(model=model, mode=mode, train_test_id=train_test_id,
-                                                        args=args, device=device,
-                                                        criterion=criterion, optimizer=optimizer, results=results,
-                                                        metric=metric, epoch=ep, scheduler=scheduler)
-                else:
-                    metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id,
-                                                    args=args, device=device, criterion=criterion,
-                                                    optimizer=optimizer, results=results, metric=metric, epoch=ep,
-                                                    scheduler=scheduler)
-            #if metrics[0]['f1_score'] > best_f1:
-            if ep == 199 and args.save_model:
-                name = '{}model_{}.pt'.format(args.model_path, args.N)
-                save_weights(model, name, metrics, optimizer)
-                best_f1 = metrics[0]['f1_score']
-            # write_tensorboard(writer, metrics=metrics, args=args)
+                metrics[i], results = make_step(model=model, mode=mode, train_test_id=train_test_id,
+                                                args=args, device=device, criterion=criterion,
+                                                optimizer=optimizer, results=results, metric=metric, epoch=ep,
+                                                scheduler=scheduler)
+            if args.save_model:
+                if metrics[0]['loss'] < best_f1:
+                    name = '{}model_{}.pt'.format(args.model_path, args.N)
+                    save_weights(model, name, metrics, optimizer)
+                    best_f1 = metrics[0]['loss']
 
         except KeyboardInterrupt:
             return
@@ -124,16 +104,6 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             print(f'\r', end='')
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
-        """if i < 5 :
-            fig = plt.figure(figsize=(10, 10))
-            ax = []
-            for i, image in enumerate(image_batch):
-                for channel in range(3, image.shape[2]):
-                    im = image.cpu().numpy()[:, :, channel]
-                    ax.append(fig.add_subplot(len(image_batch), image.shape[2], i*(image.shape[2]-3)+channel-3 + 1))
-                    ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
-                    plt.imshow(im)
-            plt.show()"""
 
         image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
         last_output = model(image_batch)
@@ -151,82 +121,10 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             loss.backward()
             optimizer.step()
 
-        #print(labels_batch)
-        #print(outputs)
         outputs = np.around(outputs.data.cpu().numpy())
         labels_batch = labels_batch.data.cpu().numpy()
-        #print(outputs, labels_batch)
-        metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
-    return
-    epoch_time = time.time() - start_time
 
-    metrics = metric.compute(epoch, epoch_time)
-
-    if mode == 'valid':
-        torch.set_grad_enabled(True)
-        scheduler.step(loss)
-
-    results = print_update(metrics, results, args, mode)
-
-    metric.reset()
-
-    return metrics, results
-
-
-def make_step_aux(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch,
-              scheduler):
-    start_time = time.time()
-    loader = make_loader(train_test_id, args=args, train=mode, shuffle=True)
-    n = len(loader)
-    if mode == 'valid':
-        torch.set_grad_enabled(False)
-    for i, (image_batch, labels_batch, names) in enumerate(loader):
-        if i == n - 1:
-            print(f'\r', end='')
-        elif i < n - 3:
-            print(f'\rBatch {i} / {n} ', end='')
-        """if i < 5 :
-            fig = plt.figure(figsize=(10, 10))
-            ax = []
-            for i, image in enumerate(image_batch):
-                for channel in range(3, image.shape[2]):
-                    im = image.cpu().numpy()[:, :, channel]
-                    ax.append(fig.add_subplot(len(image_batch), image.shape[2], i*(image.shape[2]-3)+channel-3 + 1))
-                    ax[i*(image.shape[2]-3)+channel-3].set_title(str(np.unique(im))) #names[i][5:]+
-                    plt.imshow(im)
-            plt.show()"""
-        #print(image_batch.shape)
-        image_batch = image_batch.view(-1, *image_batch.shape[-3:]).permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-        #print(image_batch.shape)
-        #print(labels_batch.shape)
-        labels_batch = labels_batch.view(-1, labels_batch.shape[-1]).to(device).type(torch.cuda.FloatTensor)
-        #print(labels_batch.shape)
-        last_output, aux_output = model(image_batch)
-
-        if isinstance(args.attribute, str):
-            labels_batch = torch.reshape(labels_batch, (-1, 1))
-
-        outputs = torch.sigmoid(last_output)
-
-        loss1 = criterion(last_output, labels_batch)
-        loss2 = torch.Tensor([0])
-        if mode == 'train':
-            for i in range(aux_output.shape[0]//args.aux_batch):
-                l = aux_output[i*args.aux_batch:(i+1)*args.aux_batch].std(dim=0).data
-                loss2 += torch.mean(l)
-
-            loss = loss1 + loss2
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-        else:
-            loss = loss1
-
-        outputs = torch.sigmoid(last_output)
-
-        outputs = np.around(outputs.data.cpu().numpy().ravel())
-        labels_batch = labels_batch.data.cpu().numpy().ravel()
-        metric.update(labels_batch, outputs, loss, loss1, loss2)
+        metric.update(labels_batch, outputs, loss)
 
     epoch_time = time.time() - start_time
 
@@ -254,9 +152,8 @@ def print_update(metrics, results, args, mode):
                                     metrics['f1_score_labels'],
                                     metrics['epoch_time']))
 
-    results = results.append({'mask_use': args.mask_use,
-                              'aux': args.aux,
-                              'aux_batch': args.aux_batch,
+    results = results.append({'model': args.model,
+                              'mask_use': args.mask_use,
                               'freeze_mode': args.freezing,
                               'lr': args.lr,
                               'exp': args.N,
@@ -266,8 +163,6 @@ def print_update(metrics, results, args, mode):
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
                               'loss': metrics['loss'],
-                              'bce_loss': metrics['bce_loss'],
-                              'std_loss': metrics['std_loss'],
                               'acc': metrics['accuracy'],
                               'acc_labels': metrics['accuracy_labels'],
                               'prec': metrics['precision'],
