@@ -84,7 +84,7 @@ class MyDataset(Dataset):
                 mask[:, :, i] = load_image(os.path.join(path, '{}_{}.h5'.format(name, attr)))[:, :, 0]
         else:
             mask = image
-
+        # print(np.unique(mask))
         if self.train == 'train':
             if self.augment_list:
                 image, mask = self.transform_fn(image, mask)
