@@ -59,7 +59,7 @@ if __name__ == "__main__":
     SEED_LIST = [r.randint(1, 500) for _ in range(10)]
     best_f1 = 0
 
-    if args.mask_use:
+    if args.mask_use:        # zeroing branch
         for c in cell:
             args.cell = c
             if args.cell:
@@ -83,7 +83,7 @@ if __name__ == "__main__":
                         print_save_results(args, results, root, i, time)
                         i += 1
     else:
-        for experiment in range(N):
+        for experiment in range(N):  # base train branch
             args.N = experiment
             print(args)
             results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])

@@ -80,6 +80,7 @@ def train(args, results, best_f1, seed):
                                                 args=args, device=device, criterion=criterion,
                                                 optimizer=optimizer, results=results, metric=metric, epoch=ep,
                                                 scheduler=scheduler)
+
             if args.save_model:
                 if metrics[0]['loss'] < best_f1:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
@@ -113,9 +114,9 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             labels_batch = torch.reshape(labels_batch, (-1, 1))
 
         outputs = nn.Sigmoid()(last_output)
-        #loss = criterion(last_output, labels_batch)
-        loss = nn.BCELoss()(outputs, labels_batch)
-
+        loss = criterion(last_output, labels_batch)
+        #loss = nn.BCELoss()(outputs, labels_batch)
+        print(loss.requires_grad)
         if mode == 'train':
             optimizer.zero_grad()
             loss.backward()
