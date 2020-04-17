@@ -4,6 +4,7 @@ import h5py
 from joblib import Parallel, delayed
 import os
 from PIL import Image
+from torchvision import transforms
 
 
 def get_ind(img_name):
@@ -38,10 +39,10 @@ def load_image(ind, img_id, args):
     print(img_id)
     ### load image
     image_file = args.impath + '%s.jpg' % img_id
-    # img = load_img(image_file, target_size=(args.size, args.size), color_mode='rgb')  # this is a PIL image
-    img_2 = Image.open(image_file)  # this is a PIL image
-    img_2 = img_2.resize((args.size, args.size))
 
+    img = Image.open(image_file)  # this is a PIL image
+    # img = img.resize((args.size, args.size))
+    img = transforms.Scale((args.size, args.size))(img)
     #print(type(img_2),type(img_np))
     #assert(np.array_equal(np.array(img_2), img_np))
     #print(np.array(img_2)[0,:5])
@@ -50,8 +51,10 @@ def load_image(ind, img_id, args):
     # img_np = img_np.astype(np.uint8)
     #print(np.unique(img_np))
 
+    img.save(args.svpath + '%s.png' % img_id, "PNG")
+    return
     hdf5_file = h5py.File(args.svpath + '%s.h5' % img_id, 'w')
-    hdf5_file.create_dataset('img', data=np.array(img_2))
+    hdf5_file.create_dataset('img', data=np.array(img))
     hdf5_file.close()
     ################
 

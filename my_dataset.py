@@ -1,9 +1,11 @@
 import os
 import torchvision.transforms.functional as TF
 from torch.utils.data import Dataset, DataLoader
-from Utils.utils import load_image
 import random
 import numpy as np
+from PIL import Image
+from torchvision import transforms
+from Utils.utils import load_image
 
 
 class MyDataset(Dataset):
@@ -26,6 +28,8 @@ class MyDataset(Dataset):
         path = self.image_path
         # Load image and from h5
         image = load_image(os.path.join(path, '%s.h5' % name))
+        # image = transforms.Scale((224,224))(image)
+        # image = np.array(image)
 
         if self.pretrained and False:
             image = (image / 255.0)

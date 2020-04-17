@@ -1,7 +1,6 @@
 import time
 import numpy as np
 import pandas as pd
-from tensorboardX import SummaryWriter
 import torch
 import torch.nn as nn
 from torch.backends import cudnn
@@ -11,6 +10,7 @@ from models import create_model
 from metrics import Metrics
 from Utils.utils import save_weights
 import random
+from torchvision import transforms
 
 
 def train(args, results, seed):
@@ -58,7 +58,6 @@ def train(args, results, seed):
 
     criterion = torch.nn.BCEWithLogitsLoss()
 
-    writer = SummaryWriter()
     metric = Metrics(args)
     best_f1 = 10 ** 8
     for ep in range(epoch, args.n_epochs):
@@ -77,12 +76,12 @@ def train(args, results, seed):
 
         except KeyboardInterrupt:
             return
-    writer.close()
     return results
 
 
 def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch):
     start_time = time.time()
+
     loader = make_loader(train_test_id, args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':
@@ -92,9 +91,11 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
             print(f'\r', end='')
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
-        image_batch = image_batch.permute(0, 3, 1, 2).to(device).type(torch.cuda.FloatTensor)
-        last_output = model(image_batch)
+
+        image_batch = image_batch.permute(0,3,1,2).to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
+
+        last_output = model(image_batch)
 
         if isinstance(args.attribute, str):
             labels_batch = torch.reshape(labels_batch, (-1, 1))
@@ -111,7 +112,7 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
         outputs = np.around(outputs.data.cpu().numpy())
         labels_batch = labels_batch.data.cpu().numpy()
         #print(outputs, labels_batch)
-        metric.update(labels_batch, outputs, loss, loss, torch.Tensor([0]))
+        metric.update(labels_batch, outputs, loss)
 
     epoch_time = time.time() - start_time
     metrics = metric.compute(epoch, epoch_time)
