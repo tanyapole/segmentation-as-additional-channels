@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from torchvision import transforms
 from Utils.utils import load_image
-
+import torch
 
 class MyDataset(Dataset):
 
@@ -27,10 +27,13 @@ class MyDataset(Dataset):
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
         # Load image and from h5
-        image = load_image(os.path.join(path, '%s.h5' % name))
-        # image = transforms.Scale((224,224))(image)
+        # image = load_image(os.path.join(path, '%s.h5' % name))
+        image = torch.load(os.path.join(path, '%s.torch' % name))
+        # print(np.unique(image))
+        # print(np.unique(image))
+        # image = TF.to_tensor(image)
         # image = np.array(image)
-
+        # image = (image / 255.0)
         if self.pretrained and False:
             image = (image / 255.0)
             mean = np.array([0.485, 0.456, 0.406])
@@ -47,8 +50,12 @@ def make_loader(train_test_id, args, train=True, shuffle=True):
     data_set = MyDataset(train_test_id=train_test_id,
                          args=args,
                          train=train)
+    if not train:
+        batch_size = args.batch_size * 10
+    else:
+        batch_size = args.batch_size
     data_loader = DataLoader(data_set,
-                             batch_size=args.batch_size,
+                             batch_size=batch_size,
                              shuffle=shuffle,
                              num_workers=args.workers,
                              pin_memory=True

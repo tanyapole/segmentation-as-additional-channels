@@ -86,13 +86,14 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
     n = len(loader)
     if mode == 'valid':
         torch.set_grad_enabled(False)
+        model.eval()
     for i, (image_batch, labels_batch, names) in enumerate(loader):
         if i == n - 1:
             print(f'\r', end='')
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
-
-        image_batch = image_batch.permute(0,3,1,2).to(device).type(torch.cuda.FloatTensor)
+        # print(np.unique(image_batch))
+        image_batch = image_batch.to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
 
         last_output = model(image_batch)

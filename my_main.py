@@ -47,7 +47,7 @@ if __name__ == "__main__":
     SEED_LIST = [r.randint(1, 500) for _ in range(10)]
 
     for experiment in range(N):
-        args.N = experiment
+        args.N = 3
         print(args)
         results = train(args, results, seed=SEED_LIST[experiment])
         print_save_results(args, results, root, i, time)
