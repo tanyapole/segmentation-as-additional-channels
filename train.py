@@ -81,7 +81,10 @@ def train(args, results, seed):
 
 def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch):
     start_time = time.time()
-
+    if mode == 'train':
+        model.train()
+    else:
+        model.eval()
     loader = make_loader(train_test_id, args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':

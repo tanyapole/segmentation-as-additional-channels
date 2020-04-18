@@ -27,8 +27,8 @@ class MyDataset(Dataset):
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
         # Load image and from h5
-        # image = load_image(os.path.join(path, '%s.h5' % name))
-        image = torch.load(os.path.join(path, '%s.torch' % name))
+        image = load_image(os.path.join(path, '%s.h5' % name))
+        # image = torch.load(os.path.join(path, '%s.torch' % name))
         # print(np.unique(image))
         # print(np.unique(image))
         # image = TF.to_tensor(image)
