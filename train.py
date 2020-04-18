@@ -134,7 +134,7 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
         outputs = nn.Sigmoid()(last_output)
         loss = criterion(last_output, labels_batch)
         #loss = nn.BCELoss()(outputs, labels_batch)
-        print(loss.requires_grad)
+
         if mode == 'train':
             optimizer.zero_grad()
             loss.backward()
@@ -151,7 +151,7 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
 
     if mode == 'valid':
         torch.set_grad_enabled(True)
-        scheduler.step(loss)
+        # scheduler.step(loss)
 
     results = print_update(metrics, results, args, mode)
 
