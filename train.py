@@ -59,6 +59,8 @@ def train(args, results, best_f1, seed):
         input_num = 3 + len(args.attribute)
         if args.model == 'resnet50':
             model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        elif args.model == 'vgg16':
+            model.features[0] = nn.Conv2d(input_num, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
         args.mask_use = True
     else:
         model, optimizer = create_model(args)
