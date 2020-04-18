@@ -49,7 +49,19 @@ def train(args, results, best_f1, seed):
     if args.cuda1:
         device = 'cuda:1'
 
-    model, optimizer = create_model(args)
+    if args.resume:
+        args.mask_use = False
+        print('resume model_{}'.format(args.N))
+        model, optimizer = create_model(args)
+        checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        input_num = 3 + len(args.attribute)
+        if args.model == 'resnet50':
+            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        args.mask_use = True
+    else:
+        model, optimizer = create_model(args)
 
     if args.show_model:
         print(model)
@@ -96,6 +108,10 @@ def train(args, results, best_f1, seed):
 def make_step(model, mode, train_test_id, args, device, criterion, optimizer, results, metric, epoch,
               scheduler):
     start_time = time.time()
+    if mode == 'train':
+        model.train()
+    else:
+        model.eval()
     loader = make_loader(train_test_id, args, train=mode, shuffle=True)
     n = len(loader)
     if mode == 'valid':

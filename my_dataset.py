@@ -132,8 +132,11 @@ def make_loader(train_test_id, args, train=True, shuffle=True):
     data_set = MyDataset(train_test_id=train_test_id,
                          args=args,
                          train=train)
+
+    batch_size = args.batch_size if train else args.batch_size*10
+
     data_loader = DataLoader(data_set,
-                             batch_size=args.batch_size,
+                             batch_size=batch_size,
                              shuffle=shuffle,
                              num_workers=args.workers,
                              pin_memory=True
