@@ -25,14 +25,8 @@ class MyDataset(Dataset):
 
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
-        # Load image and from h5
-        #image = load_image(os.path.join(path, '%s.h5' % name))
+
         image = np.load(os.path.join(path, '%s.npy' % name[5:]))
-        # image = torch.load(os.path.join(path, '%s.torch' % name))
-        # print(np.unique(image))
-        # print(np.unique(image))
-        # image = TF.to_tensor(image)
-        # image = np.array(image)
         image = (image / 255.0)
         if self.pretrained and False:
             mean = np.array([0.485, 0.456, 0.406])

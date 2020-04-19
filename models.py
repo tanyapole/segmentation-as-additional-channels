@@ -13,7 +13,7 @@ def create_model(args):
     elif args.model == 'resnet50':
         model = resnet50(pretrained=args.pretrained)
 
-    if not args.freezing:
+    if args.freezing:
         for param in model.parameters():
             param.requires_grad = False
 
