@@ -27,13 +27,14 @@ class MyDataset(Dataset):
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
         # Load image and from h5
-        image = load_image(os.path.join(path, '%s.h5' % name))
+        #image = load_image(os.path.join(path, '%s.h5' % name))
+        image = np.load(os.path.join(path, '%s.npy' % name[5:]))
         # image = torch.load(os.path.join(path, '%s.torch' % name))
         # print(np.unique(image))
         # print(np.unique(image))
         # image = TF.to_tensor(image)
         # image = np.array(image)
-        # image = (image / 255.0)
+        image = (image / 255.0)
         if self.pretrained and False:
             image = (image / 255.0)
             mean = np.array([0.485, 0.456, 0.406])
@@ -45,13 +46,13 @@ class MyDataset(Dataset):
         return image, labels, name
 
 
-def make_loader(train_test_id, args, train=True, shuffle=True):
+def make_loader(train_test_id, args, train='train', shuffle=True):
 
     data_set = MyDataset(train_test_id=train_test_id,
                          args=args,
                          train=train)
-    if not train:
-        batch_size = args.batch_size * 10
+    if train == 'valid':
+        batch_size = args.batch_size*10
     else:
         batch_size = args.batch_size
     data_loader = DataLoader(data_set,

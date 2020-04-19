@@ -96,7 +96,7 @@ def make_step(model, mode, train_test_id, args, device, criterion, optimizer, re
         elif i < n - 3:
             print(f'\rBatch {i} / {n} ', end='')
         # print(np.unique(image_batch))
-        image_batch = image_batch.to(device).type(torch.cuda.FloatTensor)
+        image_batch = image_batch.permute(0,3,1,2).to(device).type(torch.cuda.FloatTensor)
         labels_batch = labels_batch.to(device).type(torch.cuda.FloatTensor)
 
         last_output = model(image_batch)
