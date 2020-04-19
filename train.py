@@ -72,6 +72,7 @@ def train(args, results, SEED):
                 epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             results = print_update(computed_metr, results, args, 'train')
+            temp_f1 = results['f1_score']
             metrics.train.reset()
 
             start_time = time.time()
@@ -91,10 +92,10 @@ def train(args, results, SEED):
             metrics.valid.reset()
 
             if args.save_model and ep < 100:
-                if metrics.train.loss < best_f1:
+                if temp_f1 > best_f1:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, optimizer)
-                    best_f1 = metrics.train['loss']
+                    best_f1 = temp_f1
 
         except KeyboardInterrupt:
             return
