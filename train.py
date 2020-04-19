@@ -70,9 +70,9 @@ def train(args, results, SEED):
                 metrics.train.update(labels_batch, last_output, loss)
 
                 epoch_time = time.time() - start_time
-                computed_metr = metrics.train.compute(ep, epoch_time)
-                results = print_update(computed_metr, results, args, 'train')
-                metrics.train.reset()
+            computed_metr = metrics.train.compute(ep, epoch_time)
+            results = print_update(computed_metr, results, args, 'train')
+            metrics.train.reset()
 
             start_time = time.time()
             model.eval()
