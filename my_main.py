@@ -1,12 +1,15 @@
+import os
+import random
 import argparse
+import datetime
+
 from pathlib import Path
 import pandas as pd
-import os
+
 from train import train
-import datetime
 from Utils.utils import print_save_results
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-import random
 
 
 if __name__ == "__main__":
@@ -38,9 +41,7 @@ if __name__ == "__main__":
     log = root.joinpath('train.log').open('at', encoding='utf8')
 
     results = pd.DataFrame()
-
     N = args.N
-
     time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
     r = random.Random(0)
@@ -49,6 +50,6 @@ if __name__ == "__main__":
     for experiment in range(4, 4+N):
         args.N = experiment
         print(args)
-        results = train(args, results, seed=SEED_LIST[experiment])
+        results = train(args, results, SEED=SEED_LIST[experiment])
         print_save_results(args, results, root, i, time)
         i += 1

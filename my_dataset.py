@@ -1,16 +1,15 @@
 import os
-import torchvision.transforms.functional as TF
+
 from torch.utils.data import Dataset, DataLoader
-import random
+import pandas as pd
 import numpy as np
-from PIL import Image
-from torchvision import transforms
-from Utils.utils import load_image
-import torch
+
+from Utils.utils import load_image, npy_to_float_tensor, channels_first
+
 
 class MyDataset(Dataset):
 
-    def __init__(self, train_test_id, args, train):
+    def __init__(self, train_test_id: pd.DataFrame, args, train: str):
 
         self.train_test_id = train_test_id[train_test_id['Split'] == train].reset_index(drop=True)
         self.image_path = args.image_path
@@ -36,22 +35,23 @@ class MyDataset(Dataset):
         # image = np.array(image)
         image = (image / 255.0)
         if self.pretrained and False:
-            image = (image / 255.0)
             mean = np.array([0.485, 0.456, 0.406])
             std = np.array([0.229, 0.224, 0.225])
             image = (image - mean) / std
 
+        image = channels_first(image)
+
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        return image, labels, name
+        return npy_to_float_tensor(image), npy_to_float_tensor(labels), name
 
 
-def make_loader(train_test_id, args, train='train', shuffle=True):
+def make_loader(train_test_id: pd.DataFrame, args, train='train', shuffle=True) -> DataLoader:
 
     data_set = MyDataset(train_test_id=train_test_id,
                          args=args,
                          train=train)
-    if train == 'valid':
+    if train != 'train':
         batch_size = args.batch_size*10
     else:
         batch_size = args.batch_size

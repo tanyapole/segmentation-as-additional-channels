@@ -2,7 +2,7 @@ from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import numpy as np
 
 
-class Metrics:
+class Metric:
 
     def __init__(self, args):
 
@@ -10,6 +10,10 @@ class Metrics:
         self.loss = []
 
     def update(self, y_true, y_pred, loss):
+
+        y_pred = (y_pred.data.cpu().numpy() > 0) * 1
+        y_true = y_true.data.cpu().numpy()
+
         if y_true.shape[1] == 1:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
@@ -17,7 +21,7 @@ class Metrics:
         #print(self.conf_matrix)
         self.loss.append(loss.item())
 
-    def compute(self, ep, epoch_time):
+    def compute(self, ep: int, epoch_time: float) -> dict:
 
         acc_l = []
         prec_l =[]
@@ -54,3 +58,10 @@ class Metrics:
     def reset(self):
         self.conf_matrix = np.zeros([self.conf_matrix.shape[0], 2, 2])
         self.loss = []
+
+
+class Metrics:
+
+    def __init__ (self, args):
+        self.train = Metric(args)
+        self.valid = Metric(args)
