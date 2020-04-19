@@ -71,8 +71,8 @@ def train(args, results, SEED):
 
                 epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
+            temp_f1 = computed_metr['f1_score']
             results = print_update(computed_metr, results, args, 'train')
-            temp_f1 = results['f1_score']
             metrics.train.reset()
 
             start_time = time.time()
