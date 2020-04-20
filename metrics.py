@@ -10,6 +10,10 @@ class Metric:
         self.loss = []
 
     def update(self, y_true, y_pred, loss):
+
+        y_pred = (y_pred.data.cpu().numpy() > 0) * 1
+        y_true = y_true.data.cpu().numpy()
+        
         if y_true.shape[1] == 1:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
