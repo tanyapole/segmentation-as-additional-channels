@@ -90,9 +90,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 last_output = model(image_batch)
                 loss = criterion(last_output, labels_batch)
                 loss.backward()
-                print(loss)
                 optimizer.step()
-
                 metrics.train.update(labels_batch, last_output, loss)
 
             epoch_time = time.time() - start_time
