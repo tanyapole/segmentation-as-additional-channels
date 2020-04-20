@@ -102,6 +102,8 @@ class MyDataset(Dataset):
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
 
+        mask[mask == 0] = -1
+
         if self.mask_use:
             if self.train == 'valid':
                 mask.fill(0.)

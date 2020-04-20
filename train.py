@@ -91,6 +91,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 loss = criterion(last_output, labels_batch)
                 loss.backward()
                 optimizer.step()
+                print(loss)
                 metrics.train.update(labels_batch, last_output, loss)
 
             epoch_time = time.time() - start_time
