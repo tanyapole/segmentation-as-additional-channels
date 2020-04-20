@@ -13,13 +13,13 @@ class Metric:
 
         y_pred = (y_pred.data.cpu().numpy() > 0) * 1
         y_true = y_true.data.cpu().numpy()
-        
+        loss = loss.detach.cpu().numpy().item()
         if y_true.shape[1] == 1:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
             self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred)
         #print(self.conf_matrix)
-        self.loss.append(loss.item())
+        self.loss.append(loss)
 
     def compute(self, ep, epoch_time):
 
