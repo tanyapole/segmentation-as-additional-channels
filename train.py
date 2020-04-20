@@ -1,7 +1,8 @@
 import time
+import sys
+
 import numpy as np
 import pandas as pd
-
 import torch
 import torch.nn as nn
 from pathlib import Path
@@ -88,12 +89,13 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
 
                 optimizer.zero_grad()
                 last_output = model(image_batch)
+                print(last_output, labels_batch)
                 loss = criterion(last_output, labels_batch)
                 loss.backward()
                 optimizer.step()
                 print(loss)
                 metrics.train.update(labels_batch, last_output, loss)
-
+            sys.exit()
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             temp_f1 = computed_metr['f1_score']
