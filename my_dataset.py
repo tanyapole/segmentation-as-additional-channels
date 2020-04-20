@@ -1,14 +1,17 @@
 import os
+
+import numpy as np
+import pandas as pd
 import torchvision.transforms.functional as TF
 from torch.utils.data import Dataset, DataLoader
-from Utils.utils import load_image
-import random
-import numpy as np
+
+from Utils.utils import load_image, npy_to_float_tensor, channels_first
+from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH
 
 
 class MyDataset(Dataset):
 
-    def __init__(self, train_test_id, args, train):
+    def __init__(self, train_test_id: pd.DataFrame, args, train: str):
 
         self.train_test_id = train_test_id[train_test_id['Split'] == train].reset_index(drop=True)
         self.image_path = args.image_path
@@ -27,39 +30,39 @@ class MyDataset(Dataset):
     def __len__(self):
         return self.n
 
-    def transform_fn(self, image, mask):
+    def transform_fn(self, image: np.array, mask: np.array):
 
         image = TF.to_pil_image(image)
         mask_pil_array = [None] * mask.shape[-1]
         for i in range(mask.shape[-1]):
             mask_pil_array[i] = TF.to_pil_image(mask[:, :, i])
         if 'hflip' in self.augment_list:
-            if random.random() > 0.5:
+            if np.random.random() > 0.5:
                 image = TF.hflip(image)
                 for i in range(mask.shape[-1]):
                     mask_pil_array[i] = TF.hflip(mask_pil_array[i])
         if 'vflip' in self.augment_list:
-            if random.random() > 0.5:
+            if np.random.random() > 0.5:
                 image = TF.vflip(image)
                 for i in range(mask.shape[-1]):
                     mask_pil_array[i] = TF.vflip(mask_pil_array[i])
         for i in range(mask.shape[-1]):
             mask[:, :, i] = np.array(mask_pil_array[i])
         if 'affine' in self.augment_list:
-            angle = random.randint(0, 90)
-            translate = (random.uniform(0, 100), random.uniform(0, 100))
-            scale = random.uniform(0.5, 2)
-            shear = random.uniform(-10, 10)
+            angle = np.random.randint(0, 90)
+            translate = (np.random.uniform(0, 100), np.random.uniform(0, 100))
+            scale = np.random.uniform(0.5, 2)
+            shear = np.random.uniform(-10, 10)
             image = TF.affine(image, angle, translate, scale, shear)
             for i in range(mask.shape[-1]):
                 mask_pil_array[i] = TF.affine(mask_pil_array[i], angle, translate, scale, shear, fillcolor=-1)
         if 'adjust_brightness' in self.augment_list:
-            if random.random() < 0.3:
-                brightness_factor = random.uniform(0.8, 1.2)
+            if np.random.random() < 0.3:
+                brightness_factor = np.random.uniform(0.8, 1.2)
                 image = TF.adjust_brightness(image, brightness_factor)
         if 'adjust_saturation' in self.augment_list:
-            if random.random() < 0.3:
-                saturation_factor = random.uniform(0.8, 1.2)
+            if np.random.random() < 0.3:
+                saturation_factor = np.random.uniform(0.8, 1.2)
                 image = TF.adjust_saturation(image, saturation_factor)
 
         image = np.array(image)
@@ -72,26 +75,29 @@ class MyDataset(Dataset):
 
         return image, mask
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
 
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
-        # Load image and from h5
-        image = load_image(os.path.join(path, '%s.h5' % name))
+        # Load image and masks from npy
+        image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:]))
+        image = (image / 255.0)
+
         mask = np.empty([image.shape[0], image.shape[1], len(self.attribute)], dtype='int')
         if self.mask_use:
-            for i, attr in enumerate(self.attribute):
-                mask[:, :, i] = load_image(os.path.join(path, '{}_{}.h5'.format(name, attr)))[:, :, 0]
+            file = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))
+            for i, attr in enumerate(ALL_ATTRIBUTES):
+                if attr in self.attribute:
+                    mask[:, :, i] = file[:, :, i]
         else:
             mask = image
-        # print(np.unique(mask))
+
         if self.train == 'train':
             if self.augment_list:
                 image, mask = self.transform_fn(image, mask)
 
         if self.pretrained:
             if self.normalize:
-                image = (image / 255.0)
                 mean = np.array([0.485, 0.456, 0.406])
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
@@ -112,13 +118,13 @@ class MyDataset(Dataset):
         return image_with_mask, labels, name
 
 
-def full_mask_clear(mask, prob):
+def full_mask_clear(mask: np.array, prob: float) -> np.array:
     if np.random.uniform(0, 1) < prob:
         mask.fill(0.)
     return mask
 
 
-def quatro_mask_clear(mask, shape, cell_size, prob):
+def quatro_mask_clear(mask: np.array, shape, cell_size: int, prob: float) -> np.array:
     for i in range(0, shape, cell_size):
         for j in range(0, shape, cell_size):
             p = np.random.uniform(0, 1)
@@ -127,13 +133,13 @@ def quatro_mask_clear(mask, shape, cell_size, prob):
     return mask
 
 
-def make_loader(train_test_id, args, train=True, shuffle=True):
+def make_loader(train_test_id: pd.DataFrame, args, train: str = 'train', shuffle: bool = True) -> DataLoader:
 
     data_set = MyDataset(train_test_id=train_test_id,
                          args=args,
                          train=train)
 
-    batch_size = args.batch_size if train else args.batch_size*10
+    batch_size = args.batch_size if train == 'train' else args.batch_size*10
 
     data_loader = DataLoader(data_set,
                              batch_size=batch_size,

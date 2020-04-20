@@ -18,7 +18,7 @@ def create_model(args):
     else:
         return
 
-    if not args.freezing:
+    if args.freezing:
         for param in model.parameters():
             param.requires_grad = False
 

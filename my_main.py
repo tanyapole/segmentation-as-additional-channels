@@ -1,13 +1,15 @@
-import argparse
-from pathlib import Path
-import pandas as pd
 import os
-from train import train
-import datetime
-from Utils.utils import print_save_results
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import random
+import argparse
+import datetime
 
+import pandas as pd
+from pathlib import Path
+
+from train import train
+from Utils.utils import print_save_results
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
 
@@ -57,7 +59,6 @@ if __name__ == "__main__":
     i = 0
     r = random.Random(0)
     SEED_LIST = [r.randint(1, 500) for _ in range(10)]
-    best_f1 = 0
 
     for experiment in range(N):
         args.N = experiment
@@ -70,18 +71,18 @@ if __name__ == "__main__":
                         for p in probs:
                             args.prob = p
                             print(args)
-                            results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
+                            results = train(args, results, SEED=SEED_LIST[experiment])
                             print_save_results(args, results, root, i, time)
                             i += 1
                 else:
                     for p in probs:
                         args.prob = p
                         print(args)
-                        results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
+                        results = train(args, results, SEED=SEED_LIST[experiment])
                         print_save_results(args, results, root, i, time)
                         i += 1
         else:
             print(args)  # base train branch
-            results, best_f1 = train(args, results, best_f1, seed=SEED_LIST[experiment])
+            results = train(args, results, SEED=SEED_LIST[experiment])
             print_save_results(args, results, root, i, time)
             i += 1
