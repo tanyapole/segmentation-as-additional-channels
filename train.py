@@ -1,5 +1,4 @@
 import time
-import sys
 
 import numpy as np
 import pandas as pd
@@ -93,7 +92,6 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 loss.backward()
                 optimizer.step()
                 metrics.train.update(labels_batch, last_output, loss)
-            sys.exit()
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             temp_f1 = computed_metr['f1_score']
