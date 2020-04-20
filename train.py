@@ -42,11 +42,12 @@ def train(args, results, SEED):
 
     # model = nn.DataParallel(model)
     model.to(device)
+    model = torch.nn.DataParallel(model)
     criterion = torch.nn.BCEWithLogitsLoss()
     trn_dl, val_dl = make_loader(train_test_id, args, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train='valid', shuffle=False)
     metrics = Metrics(args)
-    best_f1 = 10 ** 8
+    best_f1 = 0
     for ep in range(1, args.n_epochs):
         try:
             start_time = time.time()
