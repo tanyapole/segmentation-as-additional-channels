@@ -113,9 +113,10 @@ class MyDataset(Dataset):
         else:
             image_with_mask = image
 
+        image_with_mask = channels_first(image_with_mask)
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        return image_with_mask, labels, name
+        return npy_to_float_tensor(image_with_mask), npy_to_float_tensor(labels), name
 
 
 def full_mask_clear(mask: np.array, prob: float) -> np.array:
