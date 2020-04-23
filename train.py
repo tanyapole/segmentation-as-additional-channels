@@ -80,18 +80,31 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 else:
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
-                image_batch = image_batch.to(device)
-                labels_batch = labels_batch.to(device)
+                if not args.aux:
+                    image_batch = image_batch.to(device)
+                    labels_batch = labels_batch.to(device)
+                else:
+                    image_batch = image_batch.view().to(device)
+                    labels_batch = labels_batch.view().to(device)
 
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
 
                 optimizer.zero_grad()
                 last_output = model(image_batch)
-                loss = criterion(last_output, labels_batch)
+                loss1 = criterion(last_output, labels_batch)
+
+                if args.aux:
+                    loss2 = torch.Tensor([0])
+                    for i in range(aux_output.shape[0] // args.aux_batch):
+                        l = aux_output[i * args.aux_batch:(i + 1) * args.aux_batch].std(dim=0).data
+                        loss2 += torch.mean(l)
+                    loss = loss1 + loss2
+                else:
+                    loss = loss1
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, last_output, loss)
+                metrics.train.update(labels_batch, last_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             temp_f1 = computed_metr['f1_score']

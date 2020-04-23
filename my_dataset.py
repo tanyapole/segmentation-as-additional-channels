@@ -115,6 +115,8 @@ class MyDataset(Dataset):
         else:
             image_with_mask = image
 
+
+
         image_with_mask = channels_first(image_with_mask)
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
