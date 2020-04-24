@@ -117,11 +117,9 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 for i, (image_batch, labels_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
                     labels_batch = labels_batch.to(device)
-                    last_output = model(image_batch)
+                    last_output, aux_output = model(image_batch)
                     if isinstance(args.attribute, str):
                         labels_batch = torch.reshape(labels_batch, (-1, 1))
-                    print(last_output.shape)
-                    print(labels_batch.shape)
                     loss = criterion(last_output, labels_batch)
                     metrics.valid.update(labels_batch, last_output, loss)
             epoch_time = time.time() - start_time
