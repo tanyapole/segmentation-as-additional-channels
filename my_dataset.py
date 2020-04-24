@@ -5,7 +5,7 @@ import pandas as pd
 import torchvision.transforms.functional as TF
 from torch.utils.data import Dataset, DataLoader
 
-from Utils.utils import load_image, npy_to_float_tensor, channels_first
+from Utils.utils import npy_to_float_tensor, channels_first
 from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH
 
 
