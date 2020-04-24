@@ -121,7 +121,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     if isinstance(args.attribute, str):
                         labels_batch = torch.reshape(labels_batch, (-1, 1))
                     loss = criterion(last_output, labels_batch)
-                    metrics.valid.update(labels_batch, last_output, loss)
+                    metrics.valid.update(labels_batch, last_output, loss, loss, torch.cuda.FloatTensor([0.]))
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
             results = print_update(computed_metr, results, args, 'valid')
