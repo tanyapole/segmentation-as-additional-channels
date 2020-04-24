@@ -120,6 +120,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     last_output = model(image_batch)
                     if isinstance(args.attribute, str):
                         labels_batch = torch.reshape(labels_batch, (-1, 1))
+                    print(last_output, labels_batch)
                     loss = criterion(last_output, labels_batch)
                     metrics.valid.update(labels_batch, last_output, loss)
             epoch_time = time.time() - start_time
