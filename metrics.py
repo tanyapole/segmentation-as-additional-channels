@@ -16,6 +16,8 @@ class Metric:
         y_pred = (y_pred.data.cpu().numpy() > 0) * 1
         y_true = y_true.data.cpu().numpy()
         loss = loss.detach().cpu().numpy().item()
+        bce_loss = bce_loss.detach().cpu().numpy().item()
+        std_loss = std_loss.detach().cpu().numpy().item()
         if y_true.shape[1] == 1:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
