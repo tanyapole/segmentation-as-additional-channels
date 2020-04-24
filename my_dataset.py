@@ -18,7 +18,7 @@ def read_all_images(path, train_test_id):
 
 def read_all_masks(path, train_test_id):
     masks_dict = {
-        name: np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
+        name: np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
     }
     return masks_dict
 
@@ -100,7 +100,6 @@ class MyDataset(Dataset):
         # Load image and masks from npy
         image = self.images_dict[name]
         image = (image / 255.0)
-
         if self.mask_use:
             mask = self.masks_dict[name][:, :, self.indexes]
         else:
