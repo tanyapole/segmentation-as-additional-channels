@@ -140,7 +140,7 @@ class MyDataset(Dataset):
                 mask.fill(0.)
                 image_with_mask = np.dstack((image, mask))
 
-        if self.aux:
+        if self.aux and self.train == 'train':
             image_with_mask = channels_first(image_with_mask, channel=1)
         else:
             image_with_mask = channels_first(image_with_mask)
