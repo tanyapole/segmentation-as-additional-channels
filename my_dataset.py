@@ -9,12 +9,28 @@ from Utils.utils import load_image, npy_to_float_tensor, channels_first
 from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH
 
 
+def read_all_images(path, train_test_id):
+    images_dict = {
+        name: np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
+    }
+    return images_dict
+
+
+def read_all_masks(path, train_test_id):
+    masks_dict = {
+        name: np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
+    }
+    return masks_dict
+
+
 class MyDataset(Dataset):
 
     def __init__(self, train_test_id: pd.DataFrame, args, train: str):
 
         self.train_test_id = train_test_id[train_test_id['Split'] == train].reset_index(drop=True)
-        self.image_path = args.image_path
+
+        self.images_dict = read_all_images(args.image_path, self.train_test_id)
+        self.masks_dict = read_all_masks(args.image_path, self.train_test_id)
         self.pretrained = args.pretrained
         self.attribute = args.attribute
         self.mask_use = args.mask_use
@@ -24,8 +40,8 @@ class MyDataset(Dataset):
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.normalize = args.normalize
-        self.aux = args.aux
-        self.aux_batch = args.aux_batch
+        self.pair = args.pair
+        self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
 
         self.n = self.train_test_id.shape[0]
 
@@ -80,17 +96,13 @@ class MyDataset(Dataset):
     def __getitem__(self, index: int):
 
         name = self.train_test_id.iloc[index].ID
-        path = self.image_path
+
         # Load image and masks from npy
-        image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:]))
+        image = self.images_dict[name]
         image = (image / 255.0)
 
-        mask = np.empty([image.shape[0], image.shape[1], len(self.attribute)], dtype='int')
         if self.mask_use:
-            file = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))
-            for i, attr in enumerate(ALL_ATTRIBUTES):
-                if attr in self.attribute:
-                    mask[:, :, i] = file[:, :, i]
+            mask = self.masks_dict[name][:, :, self.indexes]
         else:
             mask = image
 
@@ -106,61 +118,26 @@ class MyDataset(Dataset):
 
         mask[mask == 0] = -1
 
-        if self.mask_use and not self.aux:
+        if self.mask_use:
             if self.train == 'valid':
                 mask.fill(0.)
-            elif self.cell:
-                mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
-            else:
-                mask = full_mask_clear(mask, self.prob)
             image_with_mask = np.dstack((image, mask))
         else:
             image_with_mask = image
 
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        if self.aux and self.mask_use:
-            im, l = np.array([]), np.array([])
-            if self.train == 'train':
-                for i in range(self.aux_batch):
-                    prob = np.random.choice([0.01, 0.2, 0.8])
-                    fill_method = np.random.choice([0, 1])
-                    cell_size = np.random.choice([14, 28, 56])
-                    if fill_method == 0:
-                        mask = quatro_mask_clear(mask, image.shape[0], cell_size, prob)
-                    else:
-                        mask = full_mask_clear(mask, prob)
-                    im = np.dstack((image, mask))
-                    if i == 0:
-                        image_with_mask = np.array([im])
-                    else:
-                        image_with_mask = np.concatenate((image_with_mask, np.array([im])), axis=0)
-                labels = np.array([labels for i in range(self.aux_batch)])
-            else:
-                mask.fill(0.)
-                image_with_mask = np.dstack((image, mask))
+        image_with_mask = channels_first(image_with_mask)
 
-        if self.aux and self.train == 'train':
-            image_with_mask = channels_first(image_with_mask, channel=1)
-        else:
-            image_with_mask = channels_first(image_with_mask)
+        if self.pair and self.train == 'train':
+            image_with_mask_zero = image_with_mask.copy()
+            image_with_mask_zero[3:].fill(0.)
+            return npy_to_float_tensor(image_with_mask), \
+                   npy_to_float_tensor(image_with_mask_zero), \
+                   npy_to_float_tensor(labels),\
+                   name
 
         return npy_to_float_tensor(image_with_mask), npy_to_float_tensor(labels), name
-
-
-def full_mask_clear(mask: np.array, prob: float) -> np.array:
-    if np.random.uniform(0, 1) < prob:
-        mask.fill(0.)
-    return mask
-
-
-def quatro_mask_clear(mask: np.array, shape, cell_size: int, prob: float) -> np.array:
-    for i in range(0, shape, cell_size):
-        for j in range(0, shape, cell_size):
-            p = np.random.uniform(0, 1)
-            if p < prob:
-                mask[i:i + cell_size, j:j + cell_size, :].fill(0.)
-    return mask
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train: str = 'train', shuffle: bool = True) -> DataLoader:

@@ -60,6 +60,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     else:
         pos_weight = None
     criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
+    mse = nn.MSELoss()
 
     scheduler = MultiStepLR(optimizer, [50,100,140,180], gamma=0.2)
 
@@ -74,34 +75,29 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
             start_time = time.time()
             model.train()
             n_trn = len(trn_dl)
-            for i, (image_batch, labels_batch, names) in enumerate(trn_dl):
+            for i, (image_batch, image_batch_z, labels_batch, names) in enumerate(trn_dl):
                 if i == n_trn - 1:
                     print(f'\r', end='')
                 else:
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
-                if not args.aux:
-                    image_batch = image_batch.to(device)
-                    labels_batch = labels_batch.to(device)
-                else:
-                    image_batch = image_batch.view(-1, *image_batch.shape[-3:]).to(device)
-                    labels_batch = labels_batch.view(-1, labels_batch.shape[-1]).to(device)
+                image_batch = image_batch.to(device)
+                image_batch_z = image_batch_z.to(device)
+                labels_batch = labels_batch.to(device)
 
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
 
                 optimizer.zero_grad()
-                last_output, aux_output = model(image_batch)
-                loss1 = criterion(last_output, labels_batch)
-                loss2 = torch.FloatTensor([0.]).to(device)
+                last_output = model(image_batch)
 
-                if args.aux:
-                    for i in range(aux_output.shape[0] // args.aux_batch):
-                        l = aux_output[i * args.aux_batch:(i + 1) * args.aux_batch].std(dim=0).data
-                        loss2 += torch.mean(l)
-                    loss = loss1 + loss2
-                else:
-                    loss = loss1
+                with torch.no_grad():
+                    last_output_z = model(image_batch_z)
+                loss1 = criterion(last_output, labels_batch)
+
+                loss2 = mse(last_output, last_output_z)
+                loss = loss1 + loss2
+
                 loss.backward()
                 optimizer.step()
                 metrics.train.update(labels_batch, last_output, loss, loss1, loss2)

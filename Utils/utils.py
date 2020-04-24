@@ -1,17 +1,10 @@
 import json
-import h5py
 import os
 import random
 
 import torch
 import pandas as pd
 import numpy as np
-
-
-def load_image(file_name: str) -> np.array:
-    f = h5py.File(file_name, 'r')
-    file_np = f['img'][()]
-    return file_np
 
 
 def read_split_data(SEED: int, border: int = 1800) -> pd.DataFrame:
@@ -39,10 +32,10 @@ def print_save_results(args, results, root, i, time):
 
 
 def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFrame:
-    print('''Epoch: {} Loss: {:.6f} Std_loss{:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
+    print('''Epoch: {} Loss: {:.6f} Pair_loss{:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
              Time: {:.4f}'''.format(metrics['epoch'],
                                     metrics['loss'],
-                                    metrics['std_loss'],
+                                    metrics['pair_loss'],
                                     metrics['accuracy'],
                                     metrics['precision'],
                                     metrics['recall'],
@@ -52,11 +45,9 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
 
     results = results.append({'model': args.model,
                               'lr': args.lr,
-                              'aux': args.aux,
-                              'aux_batch': args.aux_batch,
-                              'aux_layer_index': args.aux_layer_index,
+                              'pair': args.aux,
                               'bce_loss': metrics['bce_loss'],
-                              'std_loss': metrics['std_loss'],
+                              'pair_loss': metrics['pair_loss'],
                               'exp': args.N,
                               'train_mode': mode,
                               'epoch': metrics['epoch'],

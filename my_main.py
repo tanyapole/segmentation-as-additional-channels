@@ -41,9 +41,7 @@ if __name__ == "__main__":
     arg('--normalize', action='store_true')
     arg('--pos_weight', action='store_true')
     arg('--weights', type=float, nargs='*', default=[])
-    arg('--aux', action='store_true')
-    arg('--aux_batch', type=int, default=1)
-    arg('--aux_layer_index', type=int, default=9, choices=[9, 16, 23])  # 112 56 or 28
+    arg('--pair', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -65,33 +63,7 @@ if __name__ == "__main__":
 
     for experiment in range(N):
         args.N = experiment
-        if args.aux:    # aux loss branch
-            print(args)
-            results = train(args, results, SEED=SEED_LIST[experiment])
-            print_save_results(args, results, root, i, time)
-            i += 1
-        else:
-            if args.mask_use:  # zeroing branch
-                for c in cell:
-                    args.cell = c
-                    if args.cell:
-                        for cs in cell_size:
-                            args.cell_size = cs
-                            for p in probs:
-                                args.prob = p
-                                print(args)
-                                results = train(args, results, SEED=SEED_LIST[experiment])
-                                print_save_results(args, results, root, i, time)
-                                i += 1
-                    else:
-                        for p in probs:
-                            args.prob = p
-                            print(args)
-                            results = train(args, results, SEED=SEED_LIST[experiment])
-                            print_save_results(args, results, root, i, time)
-                            i += 1
-            else:
-                print(args)  # base train branch
-                results = train(args, results, SEED=SEED_LIST[experiment])
-                print_save_results(args, results, root, i, time)
-                i += 1
+        print(args)
+        results = train(args, results, SEED=SEED_LIST[experiment])
+        print_save_results(args, results, root, i, time)
+        i += 1
