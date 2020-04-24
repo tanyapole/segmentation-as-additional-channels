@@ -24,6 +24,8 @@ class MyDataset(Dataset):
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.normalize = args.normalize
+        self.aux = args.aux
+        self.aux_batch = args.aux_batch
 
         self.n = self.train_test_id.shape[0]
 
@@ -104,7 +106,7 @@ class MyDataset(Dataset):
 
         mask[mask == 0] = -1
 
-        if self.mask_use:
+        if self.mask_use and not self.aux:
             if self.train == 'valid':
                 mask.fill(0.)
             elif self.cell:
@@ -115,10 +117,33 @@ class MyDataset(Dataset):
         else:
             image_with_mask = image
 
-
-
-        image_with_mask = channels_first(image_with_mask)
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
+
+        if self.aux and self.mask_use:
+            im, l = np.array([]), np.array([])
+            if self.train == 'train':
+                for i in range(self.aux_batch):
+                    prob = np.random.choice([0.01, 0.2, 0.8])
+                    fill_method = np.random.choice([0, 1])
+                    cell_size = np.random.choice([14, 28, 56])
+                    if fill_method == 0:
+                        mask = quatro_mask_clear(mask, image.shape[0], cell_size, prob)
+                    else:
+                        mask = full_mask_clear(mask, prob)
+                    im = np.dstack((image, mask))
+                    if i == 0:
+                        image_with_mask = np.array([im])
+                    else:
+                        image_with_mask = np.concatenate((image_with_mask, np.array([im])), axis=0)
+                labels = np.array([labels for i in range(self.aux_batch)])
+            else:
+                mask.fill(0.)
+                image_with_mask = np.dstack((image, mask))
+
+        if self.aux:
+            image_with_mask = channels_first(image_with_mask, channel=1)
+        else:
+            image_with_mask = channels_first(image_with_mask)
 
         return npy_to_float_tensor(image_with_mask), npy_to_float_tensor(labels), name
 

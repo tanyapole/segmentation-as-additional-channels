@@ -8,8 +8,10 @@ class Metric:
 
         self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
         self.loss = []
+        self.bce_loss = []
+        self.std_loss = []
 
-    def update(self, y_true, y_pred, loss):
+    def update(self, y_true, y_pred, loss, bce_loss, std_loss):
 
         y_pred = (y_pred.data.cpu().numpy() > 0) * 1
         y_true = y_true.data.cpu().numpy()
@@ -20,6 +22,8 @@ class Metric:
             self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred)
         #print(self.conf_matrix)
         self.loss.append(loss)
+        self.bce_loss.append(bce_loss)
+        self.std_loss.append(std_loss)
 
     def compute(self, ep, epoch_time):
 
@@ -40,10 +44,14 @@ class Metric:
         rec  = sum(rec_l) / len(rec_l)
         f1   = sum(f1_l)  / len(f1_l)
         loss = sum(self.loss) / len(self.loss)
+        bce_loss = sum(self.bce_loss) / len(self.bce_loss)
+        std_loss = sum(self.std_loss) / len(self.std_loss)
 
         return {
                     'epoch': ep,
                     'loss': loss,
+                    'bce_loss': bce_loss,
+                    'std_loss': std_loss,
                     'epoch_time': epoch_time,
                     'accuracy': acc,
                     'accuracy_labels': acc_l,
@@ -58,6 +66,9 @@ class Metric:
     def reset(self):
         self.conf_matrix = np.zeros([self.conf_matrix.shape[0], 2, 2])
         self.loss = []
+        self.bce_loss = []
+        self.std_loss = []
+
 
 class Metrics:
 

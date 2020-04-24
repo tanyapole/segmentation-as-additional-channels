@@ -17,7 +17,7 @@ class Args:
         self.model = 'vgg16'
         self.mask_use = True
         self.freezing = False
-        self.pretrained = True
+        self.pretrained = False
         self.batch_norm = False
         self.optimizer = 'adam'
         self.lr = 0.0001
@@ -32,13 +32,9 @@ class Args:
 args = Args()
 model, optimizer = create_model(args=args)
 #print(model)
-"""model = models.vgg16(pretrained=True)
-model.features[0] = nn.Conv2d(8, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
-num_ftrs = model.classifier[6].in_features
-model.classifier[6] = nn.Linear(num_ftrs, 5)
-optimizer = Adam(model.parameters(), lr=0.0001)"""
+print(model)
 
-train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
+"""train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
 path = 'D:/Data/albums/'
 batch =np.zeros([2, 224, 224, 8])
 for i, name in enumerate(train_test_id.iloc[:2].ID):
@@ -59,3 +55,4 @@ for i, (image_batch, label_batch, name) in enumerate(trn_dl):
     out = model(image_batch)
     print(out)
     break
+"""

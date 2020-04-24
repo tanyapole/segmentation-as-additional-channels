@@ -84,18 +84,18 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     image_batch = image_batch.to(device)
                     labels_batch = labels_batch.to(device)
                 else:
-                    image_batch = image_batch.view().to(device)
-                    labels_batch = labels_batch.view().to(device)
+                    image_batch = image_batch.view(-1, *image_batch.shape[-3:]).to(device)
+                    labels_batch = labels_batch.view(-1, labels_batch.shape[-1]).to(device)
 
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
 
                 optimizer.zero_grad()
-                last_output = model(image_batch)
+                last_output, aux_output = model(image_batch)
                 loss1 = criterion(last_output, labels_batch)
+                loss2 = torch.Tensor([0])
 
                 if args.aux:
-                    loss2 = torch.Tensor([0])
                     for i in range(aux_output.shape[0] // args.aux_batch):
                         l = aux_output[i * args.aux_batch:(i + 1) * args.aux_batch].std(dim=0).data
                         loss2 += torch.mean(l)

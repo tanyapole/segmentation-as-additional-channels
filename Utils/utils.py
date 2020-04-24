@@ -51,6 +51,11 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
 
     results = results.append({'model': args.model,
                               'lr': args.lr,
+                              'aux': args.aux,
+                              'aux_batch': args.aux_batch,
+                              'aux_layer_index': args.aux_layer_index,
+                              'bce_loss': metrics['bce_loss'],
+                              'std_loss': metrics['std_loss'],
                               'exp': args.N,
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
@@ -70,7 +75,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
     return results
 
 
-def channels_first(arr:np.array) -> np.array: return np.moveaxis(arr, -1, 0)
+def channels_first(arr:np.array, channel:int=0) -> np.array: return np.moveaxis(arr, -1, channel)
 def npy_to_float_tensor(arr:np.array) -> torch.Tensor: return torch.tensor(arr, dtype=torch.float32)
 
 
