@@ -93,7 +93,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 optimizer.zero_grad()
                 last_output, aux_output = model(image_batch)
                 loss1 = criterion(last_output, labels_batch)
-                loss2 = torch.Tensor([0])
+                loss2 = torch.FloatTensor([0.]).to(device)
 
                 if args.aux:
                     for i in range(aux_output.shape[0] // args.aux_batch):
