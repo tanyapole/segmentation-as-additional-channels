@@ -53,10 +53,8 @@ if __name__ == "__main__":
 
     N = args.N
 
-    if args.mask_use:
-        cell = [True, False]
-        cell_size = args.cell_size
-        probs = args.prob
+    layers = [9, 16, 23]
+
 
     time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
@@ -66,32 +64,9 @@ if __name__ == "__main__":
     for experiment in range(N):
         args.N = experiment
         if args.aux:    # aux loss branch
-            print(args)
-            results = train(args, results, SEED=SEED_LIST[experiment])
-            print_save_results(args, results, root, i, time)
-            i += 1
-        else:
-            if args.mask_use:  # zeroing branch
-                for c in cell:
-                    args.cell = c
-                    if args.cell:
-                        for cs in cell_size:
-                            args.cell_size = cs
-                            for p in probs:
-                                args.prob = p
-                                print(args)
-                                results = train(args, results, SEED=SEED_LIST[experiment])
-                                print_save_results(args, results, root, i, time)
-                                i += 1
-                    else:
-                        for p in probs:
-                            args.prob = p
-                            print(args)
-                            results = train(args, results, SEED=SEED_LIST[experiment])
-                            print_save_results(args, results, root, i, time)
-                            i += 1
-            else:
-                print(args)  # base train branch
+            for l in layers:
+                args.aux_layer_index = l
+                print(args)
                 results = train(args, results, SEED=SEED_LIST[experiment])
                 print_save_results(args, results, root, i, time)
                 i += 1
