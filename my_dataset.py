@@ -9,12 +9,28 @@ from Utils.utils import load_image, npy_to_float_tensor, channels_first
 from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH
 
 
+def read_all_images(path: str, train_test_id: pd.DataFrame) -> dict:
+    images_dict = {
+        name: np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
+    }
+    return images_dict
+
+
+def read_all_masks(path: str, train_test_id: pd.DataFrame) -> dict:
+    masks_dict = {
+        name: np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:])) for name in train_test_id.ID
+    }
+    return masks_dict
+
+
 class MyDataset(Dataset):
 
     def __init__(self, train_test_id: pd.DataFrame, args, train: str):
 
         self.train_test_id = train_test_id[train_test_id['Split'] == train].reset_index(drop=True)
-        self.image_path = args.image_path
+        self.images_dict = read_all_images(args.image_path, self.train_test_id)
+        self.masks_dict = read_all_masks(args.image_path, self.train_test_id)
+
         self.pretrained = args.pretrained
         self.attribute = args.attribute
         self.mask_use = args.mask_use
@@ -24,6 +40,7 @@ class MyDataset(Dataset):
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.normalize = args.normalize
+        self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
 
         self.n = self.train_test_id.shape[0]
 
@@ -78,17 +95,12 @@ class MyDataset(Dataset):
     def __getitem__(self, index: int):
 
         name = self.train_test_id.iloc[index].ID
-        path = self.image_path
         # Load image and masks from npy
-        image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:]))
+        image = self.images_dict[name]
         image = (image / 255.0)
 
-        mask = np.empty([image.shape[0], image.shape[1], len(self.attribute)], dtype='int')
         if self.mask_use:
-            file = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))
-            for i, attr in enumerate(ALL_ATTRIBUTES):
-                if attr in self.attribute:
-                    mask[:, :, i] = file[:, :, i]
+            mask = self.masks_dict[name][:, :, self.indexes]
         else:
             mask = image
 
