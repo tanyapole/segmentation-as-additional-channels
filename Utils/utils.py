@@ -45,7 +45,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
 
     results = results.append({'model': args.model,
                               'lr': args.lr,
-                              'pair': args.aux,
+                              'pair': args.pair,
                               'bce_loss': metrics['bce_loss'],
                               'pair_loss': metrics['pair_loss'],
                               'exp': args.N,
