@@ -113,7 +113,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 for i, (image_batch, labels_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
                     labels_batch = labels_batch.to(device)
-                    last_output, aux_output = model(image_batch)
+                    last_output = model(image_batch)
                     if isinstance(args.attribute, str):
                         labels_batch = torch.reshape(labels_batch, (-1, 1))
                     loss = criterion(last_output, labels_batch)
