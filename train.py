@@ -95,7 +95,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     last_output_z = model(image_batch_z)
                 loss1 = criterion(last_output, labels_batch)
 
-                loss2 = mse(last_output, last_output_z)
+                loss2 = mse(nn.Sigmoid()(last_output), nn.Sigmoid()(last_output_z))
                 loss = loss1 + loss2
 
                 loss.backward()
