@@ -41,6 +41,7 @@ if __name__ == "__main__":
     arg('--normalize', action='store_true')
     arg('--pos_weight', action='store_true')
     arg('--weights', type=float, nargs='*', default=[])
+    arg('--train_zero_mask', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)

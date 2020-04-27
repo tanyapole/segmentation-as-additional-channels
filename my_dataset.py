@@ -24,6 +24,7 @@ class MyDataset(Dataset):
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.normalize = args.normalize
+        self.train_zero_mask = args.train_zero_mask
 
         self.n = self.train_test_id.shape[0]
 
@@ -105,7 +106,7 @@ class MyDataset(Dataset):
         mask[mask == 0] = -1
 
         if self.mask_use:
-            if self.train == 'valid':
+            if self.train == 'valid' or self.train_zero_mask:
                 mask.fill(0.)
             elif self.cell:
                 mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
