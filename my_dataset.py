@@ -105,8 +105,11 @@ class MyDataset(Dataset):
 
         mask[mask == 0] = -1
 
+        if self.train_zero_mask:
+            mask.fill(0.)
+        
         if self.mask_use:
-            if self.train == 'valid' or self.train_zero_mask:
+            if self.train == 'valid':
                 mask.fill(0.)
             elif self.cell:
                 mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
