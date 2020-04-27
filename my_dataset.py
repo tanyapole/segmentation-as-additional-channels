@@ -107,7 +107,7 @@ class MyDataset(Dataset):
 
         if self.train_zero_mask:
             mask.fill(0.)
-        
+
         if self.mask_use:
             if self.train == 'valid':
                 mask.fill(0.)

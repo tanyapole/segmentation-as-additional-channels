@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     for experiment in range(N):
         args.N = experiment
-        if args.mask_use:  # zeroing branch
+        if args.mask_use and not args.train_zero_mask:  # zeroing branch
             for c in cell:
                 args.cell = c
                 if args.cell:
