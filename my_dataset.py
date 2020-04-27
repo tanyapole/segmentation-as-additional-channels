@@ -107,17 +107,18 @@ class MyDataset(Dataset):
 
         if self.train_zero_mask:
             mask.fill(0.)
-
-        if self.mask_use:
-            if self.train == 'valid':
-                mask.fill(0.)
-            elif self.cell:
-                mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
-            else:
-                mask = full_mask_clear(mask, self.prob)
             image_with_mask = np.dstack((image, mask))
         else:
-            image_with_mask = image
+            if self.mask_use:
+                if self.train == 'valid':
+                    mask.fill(0.)
+                elif self.cell:
+                    mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
+                else:
+                    mask = full_mask_clear(mask, self.prob)
+                image_with_mask = np.dstack((image, mask))
+            else:
+                image_with_mask = image
 
         image_with_mask = channels_first(image_with_mask)
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
