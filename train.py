@@ -47,22 +47,11 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     if args.show_model:
         print(model)
 
-    model = nn.DataParallel(model)
+    # model = nn.DataParallel(model)
     model.to(device)
 
-    if args.pos_weight:
-        w = {'attribute_globules': args.weights[0],          # 1.2
-             'attribute_milia_like_cyst': args.weights[1],   # 1.2
-             'attribute_negative_network': args.weights[2],  # 1.5
-             'attribute_pigment_network': args.weights[3],   # 0.4
-             'attribute_streaks': args.weights[4]}           # 1.5
-        pos_weight = torch.Tensor([w[attr] for attr in args.attribute]).to(device)
-    else:
-        pos_weight = None
-    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
+    criterion = torch.nn.BCEWithLogitsLoss()
     mse = nn.MSELoss()
-
-    scheduler = MultiStepLR(optimizer, [50,100,140,180], gamma=0.2)
 
     # writer = SummaryWriter()
     trn_dl, val_dl = make_loader(train_test_id, args, train='train', shuffle=True), \
