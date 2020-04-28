@@ -41,7 +41,6 @@ if __name__ == "__main__":
     arg('--normalize', action='store_true')
     arg('--pos_weight', action='store_true')
     arg('--weights', type=float, nargs='*', default=[])
-    arg('--train_zero_mask', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -63,7 +62,7 @@ if __name__ == "__main__":
 
     for experiment in range(N):
         args.N = experiment
-        if args.mask_use and not args.train_zero_mask:  # zeroing branch
+        if args.mask_use:  # zeroing branch
             for c in cell:
                 args.cell = c
                 if args.cell:

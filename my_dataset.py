@@ -24,7 +24,7 @@ class MyDataset(Dataset):
         self.cell = args.cell
         self.cell_size = args.cell_size
         self.normalize = args.normalize
-        self.train_zero_mask = args.train_zero_mask
+        self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
 
         self.n = self.train_test_id.shape[0]
 
@@ -84,12 +84,8 @@ class MyDataset(Dataset):
         image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:]))
         image = (image / 255.0)
 
-        mask = np.empty([image.shape[0], image.shape[1], len(self.attribute)], dtype='int')
         if self.mask_use:
-            file = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))
-            for i, attr in enumerate(ALL_ATTRIBUTES):
-                if attr in self.attribute:
-                    mask[:, :, i] = file[:, :, i]
+            mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))[:, :, self.indexes]
         else:
             mask = image
 
@@ -105,20 +101,16 @@ class MyDataset(Dataset):
 
         mask[mask == 0] = -1
 
-        if self.train_zero_mask:
-            mask.fill(0.)
+        if self.mask_use:
+            if self.train == 'valid':
+                mask.fill(0.)
+            elif self.cell:
+                mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
+            else:
+                mask = full_mask_clear(mask, self.prob)
             image_with_mask = np.dstack((image, mask))
         else:
-            if self.mask_use:
-                if self.train == 'valid':
-                    mask.fill(0.)
-                elif self.cell:
-                    mask = quatro_mask_clear(mask, image.shape[0], self.cell_size, self.prob)
-                else:
-                    mask = full_mask_clear(mask, self.prob)
-                image_with_mask = np.dstack((image, mask))
-            else:
-                image_with_mask = image
+            image_with_mask = image
 
         image_with_mask = channels_first(image_with_mask)
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
