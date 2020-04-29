@@ -8,6 +8,7 @@ from pathlib import Path
 from torch.backends import cudnn
 from tensorboardX import SummaryWriter
 from torch.optim.lr_scheduler import MultiStepLR
+from torch.optim import Adam, SGD
 
 from metrics import Metrics
 from models import create_model
@@ -38,7 +39,16 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
 
         # args.mask_use = True
     else:
-        model, optimizer = create_model(args)
+        model = create_model(args)
+
+    parameters = filter(lambda p: p.requires_grad, model.parameters())
+
+    if args.optimizer == 'sgd':
+        optimizer = SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
+    elif args.optimizer == 'adam':
+        optimizer = Adam(parameters, lr=args.lr)
+    else:
+        optimizer = Adam(parameters, lr=args.lr)
 
     if args.show_model:
         print(model)
