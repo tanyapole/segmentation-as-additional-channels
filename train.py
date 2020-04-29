@@ -32,10 +32,14 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     if args.resume:
         #args.mask_use = False
         print('resume model_{}'.format(args.N))
-        model, optimizer = create_model(args)
+        model = create_model(args)
         checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
         # optimizer.load_state_dict(checkpoint['optimizer'])
+        if args.mask_use:
+            input_num = 3 + len(args.attribute)
+            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+            nn.init.kaiming_normal_(model.conv1.weight, mode='fan_out', nonlinearity='relu')
 
         # args.mask_use = True
     else:
