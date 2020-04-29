@@ -119,7 +119,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
             if args.save_model and ep < 100:
                 if temp_f1 > best_f1:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
-                    save_weights(model, name, ep, optimizer)
+                    save_weights(model, name, ep, optimizer, args.two_gpu)
                     best_f1 = temp_f1
 
         except KeyboardInterrupt:

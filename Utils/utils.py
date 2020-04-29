@@ -82,7 +82,11 @@ def channels_first(arr:np.array) -> np.array: return np.moveaxis(arr, -1, 0)
 def npy_to_float_tensor(arr:np.array) -> torch.Tensor: return torch.tensor(arr, dtype=torch.float32)
 
 
-def save_weights(model, model_path, epoch, optimizer):
+def save_weights(model, model_path, epoch, optimizer, two_gpu):
+    if two_gpu:
+        model_states = model.module.state_dict()
+    else:
+        model_states = model.state_dict()
     torch.save({'model': model.module.state_dict(),
                 'epoch': epoch,
                 'optimizer': optimizer.state_dict()},
