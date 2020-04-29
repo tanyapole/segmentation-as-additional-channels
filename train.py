@@ -32,13 +32,15 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
         device = 'cuda:1'
 
     if args.resume:
-        temp = copy.deepcopy(args.mask_use)
-        # args.mask_use = False
         print('resume model_{}'.format(args.N))
         model = create_model(args)
+        if args.mask_use:
+            input_num = 3 + len(args.attribute)
+            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+            nn.init.kaiming_normal_(model.conv1.weight, mode='fan_out', nonlinearity='relu')
         checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
-        # args.mask_use = True
+
     else:
         model  = create_model(args)
 
