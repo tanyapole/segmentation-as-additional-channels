@@ -25,9 +25,6 @@ def create_model(args):
 
     # channels replacement
     if args.model in ['resnet50', 'resnext101']:
-        if args.mask_use:
-            input_num = 3 + len(args.attribute)
-            model.conv1 = nn.Conv2d(input_num, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
         last_layer_in_channels = model.fc.in_features
         model.fc = nn.Linear(last_layer_in_channels, out_shape)
     elif args.model == 'vgg16':
