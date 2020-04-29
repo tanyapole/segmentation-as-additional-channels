@@ -29,6 +29,7 @@ if __name__ == "__main__":
     arg('--prob', type=float, nargs='*', default=[0.1])
     arg('--attribute', nargs='+', default=[])
     arg('--freezing', action='store_true')
+    arg('--selective_freeze', action='store_true')
     arg('--cuda1', action='store_true')
     arg('--cell', action='store_true')
     arg('--cell_size', type=int, nargs='*', default=[56])

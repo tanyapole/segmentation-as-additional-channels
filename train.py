@@ -9,11 +9,13 @@ from pathlib import Path
 from torch.backends import cudnn
 from tensorboardX import SummaryWriter
 from torch.optim.lr_scheduler import MultiStepLR
+from torch.optim import Adam, SGD
 
+from Utils.constants import LAYERS_LIST
 from metrics import Metrics
 from models import create_model
 from my_dataset import make_loader
-from Utils.utils import save_weights, read_split_data, print_update
+from Utils.utils import save_weights, read_split_data, print_update, selective_freeze
 
 
 def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
@@ -33,12 +35,24 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
         temp = copy.deepcopy(args.mask_use)
         # args.mask_use = False
         print('resume model_{}'.format(args.N))
-        model, optimizer = create_model(args)
+        model = create_model(args)
         checkpoint = torch.load(args.model_path + 'model_{}.pt'.format(args.N))
         model.load_state_dict(checkpoint['model'])
         # args.mask_use = True
     else:
         model, optimizer = create_model(args)
+
+    if args.selective_freeze:
+        model = selective_freeze(model, LAYERS_LIST)
+
+    parameters = filter(lambda p: p.requires_grad, model.parameters())
+
+    if args.optimizer == 'sgd':
+        optimizer = SGD(parameters, lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
+    elif args.optimizer == 'adam':
+        optimizer = Adam(parameters, lr=args.lr)
+    else:
+        optimizer = Adam(parameters, lr=args.lr)
 
     if args.show_model:
         print(model)
@@ -46,16 +60,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     #model = nn.DataParallel(model)
     model.to(device)
 
-    if args.pos_weight:
-        w = {'attribute_globules': args.weights[0],          # 1.2
-             'attribute_milia_like_cyst': args.weights[1],   # 1.2
-             'attribute_negative_network': args.weights[2],  # 1.5
-             'attribute_pigment_network': args.weights[3],   # 0.4
-             'attribute_streaks': args.weights[4]}           # 1.5
-        pos_weight = torch.Tensor([w[attr] for attr in args.attribute]).to(device)
-    else:
-        pos_weight = None
-    criterion = torch.nn.BCEWithLogitsLoss(pos_weight=pos_weight) # torch.Tensor([0.5, 1.0]).to(device)
+    criterion = torch.nn.BCEWithLogitsLoss()
 
     scheduler = MultiStepLR(optimizer, [50,100,140,180], gamma=0.2)
 
@@ -90,7 +95,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 metrics.train.update(labels_batch, last_output, loss)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
-            temp_f1 = computed_metr['f1_score']
+            # temp_f1 = computed_metr['f1_score']
             results = print_update(computed_metr, results, args, 'train')
             metrics.train.reset()
 
@@ -107,6 +112,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     metrics.valid.update(labels_batch, last_output, loss)
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
+            temp_f1 = computed_metr['f1_score']
             results = print_update(computed_metr, results, args, 'valid')
             metrics.valid.reset()
 

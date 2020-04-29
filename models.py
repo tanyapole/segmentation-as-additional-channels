@@ -1,6 +1,5 @@
 from torch import nn
 from torchvision import models
-from torch.optim import Adam, SGD
 from torchvision.models import resnext101_32x8d, resnet50
 
 
@@ -38,10 +37,4 @@ def create_model(args):
         num_ftrs = model.classifier[6].in_features
         model.classifier[6] = nn.Linear(num_ftrs, out_shape)
 
-    if args.optimizer == 'sgd':
-        optimizer = SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=0.0005, nesterov=True)
-    elif args.optimizer == 'adam':
-        optimizer = Adam(model.parameters(), lr=args.lr)
-    else:
-        optimizer = Adam(model.parameters(), lr=args.lr)
-    return model, optimizer
+    return model

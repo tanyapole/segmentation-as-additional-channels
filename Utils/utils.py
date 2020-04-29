@@ -8,6 +8,14 @@ import pandas as pd
 import numpy as np
 
 
+def selective_freeze(model, layers_list):
+    for name, child in model.named_children():
+        if name not in layers_list:
+            for param in child.parameters():
+                param.requires_grad = False
+    return model
+
+
 def load_image(file_name: str) -> np.array:
     f = h5py.File(file_name, 'r')
     file_np = f['img'][()]

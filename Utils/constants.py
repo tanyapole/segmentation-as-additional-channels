@@ -3,3 +3,5 @@ ALL_ATTRIBUTES = ['attribute_globules', 'attribute_milia_like_cyst', 'attribute_
 
 IMAGE_PATH = 'images_npy'
 MASK_PATH = 'masks_npy'
+
+LAYERS_LIST = ['conv1', 'fc']
