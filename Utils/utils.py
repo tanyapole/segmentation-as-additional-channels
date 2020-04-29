@@ -87,7 +87,7 @@ def save_weights(model, model_path, epoch, optimizer, two_gpu):
         model_states = model.module.state_dict()
     else:
         model_states = model.state_dict()
-    torch.save({'model': model.module.state_dict(),
+    torch.save({'model': model_states,
                 'epoch': epoch,
                 'optimizer': optimizer.state_dict()},
                str(model_path)
