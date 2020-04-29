@@ -40,7 +40,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
         model.load_state_dict(checkpoint['model'])
         # args.mask_use = True
     else:
-        model, optimizer = create_model(args)
+        model  = create_model(args)
 
     if args.selective_freeze:
         model = selective_freeze(model, LAYERS_LIST)
