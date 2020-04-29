@@ -62,7 +62,7 @@ if __name__ == "__main__":
     r = random.Random(0)
     SEED_LIST = [r.randint(1, 500) for _ in range(10)]
 
-    for experiment in range(N):
+    for experiment in range(2,2+N):
         args.N = experiment
         if args.mask_use:  # zeroing branch
             for c in cell:
