@@ -14,7 +14,7 @@ class Args:
     def __init__(self):
         self.attribute = ALL_ATTRIBUTES
         print(self.attribute)
-        self.model = 'vgg16'
+        self.model = 'resnet50'
         self.mask_use = True
         self.freezing = False
         self.pretrained = False
@@ -30,10 +30,17 @@ class Args:
         self.augment_list = []
         self.normalize = False
 args = Args()
-model, optimizer = create_model(args=args)
+model = create_model(args=args)
 #print(model)
 print(model)
+path = 'D:/Data/albums/images_npy/'
+name = os.listdir(path)[0]
+img = np.load(path + name)
+img = np.moveaxis(img, -1, 0)
+timg = torch.from_numpy(img).float()
+btimg = torch.unsqueeze(timg, dim=0)
 
+model(btimg)
 """train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
 path = 'D:/Data/albums/'
 batch =np.zeros([2, 224, 224, 8])

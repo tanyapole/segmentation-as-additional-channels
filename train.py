@@ -74,14 +74,14 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
 
                 optimizer.zero_grad()
-                last_output = model(image_batch)
+                last_output, aux_output = model(image_batch)
 
                 with torch.no_grad():
-                    last_output_z = model(image_batch_z)
+                    last_output_z, aux_output_z = model(image_batch_z)
                 loss1 = criterion(last_output, labels_batch)
 
                 # loss2 = mse(nn.Sigmoid()(last_output), nn.Sigmoid()(last_output_z))
-                loss2 = mse(last_output, last_output_z)
+                loss2 = mse(aux_output, aux_output_z)
                 loss = loss1 + loss2
 
                 loss.backward()
