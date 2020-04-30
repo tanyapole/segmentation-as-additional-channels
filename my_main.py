@@ -53,7 +53,7 @@ if __name__ == "__main__":
     N = args.N
 
     if args.mask_use:
-        cell = [True, False]
+        cell = [False]
         cell_size = args.cell_size
         probs = args.prob
 
