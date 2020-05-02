@@ -18,8 +18,8 @@ from Utils.utils import save_weights, read_split_data, print_update
 
 def jac(y_pred, y_true):
     eps = 1e-15
-    y_true = (y_true > 0) * 1
-    y_pred = (y_pred > 0) * 1
+    """y_true = (y_true > 0) * 1
+    y_pred = (y_pred > 0) * 1"""
     intersection = (y_pred * y_true).abs().sum()
     union = y_pred.abs().sum() + y_true.abs().sum()
     return 1 - ((intersection + eps) / (union - intersection + eps))
@@ -104,7 +104,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 loss1 = criterion(last_output, labels_batch)
 
                 # loss2 = mse(nn.Sigmoid()(last_output), nn.Sigmoid()(last_output_z))
-                loss2 = 0.5 * jac(last_output, last_output_z)
+                loss2 = 0.5 * jac(aux_output, aux_output_z)
                 loss = loss1 + loss2
 
                 loss.backward()

@@ -10,7 +10,7 @@ import numpy as np
 def read_split_data(SEED: int, border: int = 1800) -> pd.DataFrame:
     train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
     indexes = np.arange(train_test_id.shape[0])
-    random.seed()
+    random.seed(SEED)
     random.shuffle(indexes)
     train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
     train_test_id.loc[:border, 'Split'] = 'train'
