@@ -18,8 +18,8 @@ from Utils.utils import save_weights, read_split_data, print_update
 
 def jac(y_pred, y_true):
     eps = 1e-15
-    # jaccard_target = (targets == 1).float()
-    # jaccard_output = torch.sigmoid(outputs)
+    y_true = (y_true > 0) * 1
+    y_pred = (y_pred > 0) * 1
     intersection = (y_pred * y_true).abs().sum()
     union = y_pred.abs().sum() + y_true.abs().sum()
     return 1 - ((intersection + eps) / (union - intersection + eps))
