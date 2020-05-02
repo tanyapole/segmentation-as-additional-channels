@@ -104,7 +104,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                 loss1 = criterion(last_output, labels_batch)
 
                 # loss2 = mse(nn.Sigmoid()(last_output), nn.Sigmoid()(last_output_z))
-                loss2 = jac(last_output, last_output_z)
+                loss2 = 0.5 * jac(last_output, last_output_z)
                 loss = loss1 + loss2
 
                 loss.backward()
