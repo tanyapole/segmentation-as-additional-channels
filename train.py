@@ -69,7 +69,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
 
                 optimizer.zero_grad()
                 clsf_output, segm_output = model(image_batch)
-
+                print(clsf_output.shape, segm_output.shapes, masks_batch.shape)
                 loss1 = criterion(clsf_output, labels_batch)
                 loss2 = criterion(segm_output, masks_batch)
                 loss = loss1 + loss2
