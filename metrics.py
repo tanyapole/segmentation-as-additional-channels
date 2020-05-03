@@ -8,24 +8,24 @@ class Metric:
 
         self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
         self.loss = []
-        self.bce_loss = []
-        self.pair_loss = []
+        self.bce1_loss = []
+        self.bce2_loss = []
 
-    def update(self, y_true, y_pred, loss, bce_loss, pair_loss):
+    def update(self, y_true, y_pred, loss, bce1_loss, bce2_loss):
 
         y_pred = (y_pred.data.cpu().numpy() > 0) * 1
         y_true = y_true.data.cpu().numpy()
         loss = loss.detach().cpu().numpy().item()
-        bce_loss = bce_loss.detach().cpu().numpy().item()
-        pair_loss = pair_loss.detach().cpu().numpy().item()
+        bce1_loss = bce1_loss.detach().cpu().numpy().item()
+        bce2_loss = bce2_loss.detach().cpu().numpy().item()
         if y_true.shape[1] == 1:
             self.conf_matrix += confusion_matrix(y_true, y_pred, labels=[0, 1])
         else:
             self.conf_matrix += multilabel_confusion_matrix(y_true, y_pred)
         #print(self.conf_matrix)
         self.loss.append(loss)
-        self.bce_loss.append(bce_loss)
-        self.pair_loss.append(pair_loss)
+        self.bce1_loss.append(bce1_loss)
+        self.bce2_loss.append(bce2_loss)
 
     def compute(self, ep: int, epoch_time: float) -> dict:
 
@@ -46,14 +46,14 @@ class Metric:
         rec  = sum(rec_l) / len(rec_l)
         f1   = sum(f1_l)  / len(f1_l)
         loss = sum(self.loss) / len(self.loss)
-        bce_loss = sum(self.bce_loss) / len(self.bce_loss)
-        pair_loss = sum(self.pair_loss) / len(self.pair_loss)
+        bce1_loss = sum(self.bce1_loss) / len(self.bce1_loss)
+        bce2_loss = sum(self.bce2_loss) / len(self.bce2_loss)
 
         return {
                     'epoch': ep,
                     'loss': loss,
-                    'bce_loss': bce_loss,
-                    'pair_loss': pair_loss,
+                    'bce1_loss': bce1_loss,
+                    'bce2_loss': bce2_loss,
                     'epoch_time': epoch_time,
                     'accuracy': acc,
                     'accuracy_labels': acc_l,

@@ -19,8 +19,8 @@ def read_split_data(SEED: int, border: int = 1800) -> pd.DataFrame:
 
 
 def print_save_results(args, results, root, i, time):
-    print('Модель {}, mask usage {}, заморозка {}, lr {}, номер эксперимента {} размер квадрата {}, вероятность {}'
-          .format(args.model, args.mask_use, args.freezing, args.lr, args.N, args.cell_size, args.prob))
+    print('заморозка {}, lr {}, номер эксперимента {}'
+          .format(args.freezing, args.lr, args.N))
     root.joinpath('params_{}_num {} .json'.format(time, i)).write_text(
         json.dumps(vars(args), indent=True, sort_keys=True))
     path = 'Results/{}'.format(time)
@@ -35,7 +35,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
     print('''Epoch: {} Loss: {:.6f} Pair_loss{:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
              Time: {:.4f}'''.format(metrics['epoch'],
                                     metrics['loss'],
-                                    metrics['pair_loss'],
+                                    metrics['bce_loss'],
                                     metrics['accuracy'],
                                     metrics['precision'],
                                     metrics['recall'],
@@ -43,17 +43,13 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFram
                                     metrics['f1_score_labels'],
                                     metrics['epoch_time']))
 
-    results = results.append({'model': args.model,
+    results = results.append({'model': 'Y_net',
                               'lr': args.lr,
-                              'pair': args.pair,
-                              'bce_loss': metrics['bce_loss'],
-                              'pair_loss': metrics['pair_loss'],
+                              'bce1_loss': metrics['bce1_loss'],
+                              'bce2_loss': metrics['bce2_loss'],
                               'exp': args.N,
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
-                              'cell': args.cell,
-                              'cell_size': args.cell_size,
-                              'prob': args.prob,
                               'loss': metrics['loss'],
                               'acc': metrics['accuracy'],
                               'acc_labels': metrics['accuracy_labels'],
