@@ -67,7 +67,7 @@ class ResUNet(nn.Module):
         self.up3 = UnetUpBlock(512, 256)
         self.up4 = UnetUpBlock(in_channels=128 + 64, out_channels=128,
                                up_conv_in_channels=256, up_conv_out_channels=128)
-        self.up4 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
+        self.up5 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
                                up_conv_in_channels=128, up_conv_out_channels=64)
 
     def forward(self, x):
