@@ -49,7 +49,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     metrics = Metrics(args)
     best_f1 = 0
 
-    for ep in range(1, args.n_epochs):
+    for ep in range(0, args.n_epochs):
         try:
             start_time = time.time()
             model.train()
