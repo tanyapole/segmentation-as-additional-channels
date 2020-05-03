@@ -61,7 +61,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
                 image_batch = image_batch.to(device)
-                masks_batch = segm_output.to(device)
+                masks_batch = masks_batch.to(device)
                 labels_batch = labels_batch.to(device)
 
                 if isinstance(args.attribute, str):
