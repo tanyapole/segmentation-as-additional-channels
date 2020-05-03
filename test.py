@@ -30,7 +30,7 @@ class Args:
         self.augment_list = []
         self.normalize = False
 args = Args()
-model = create_model(args=args)
+model = models.resnet50()
 #print(model)
 print(model)
 path = 'D:/Data/albums/images_npy/'

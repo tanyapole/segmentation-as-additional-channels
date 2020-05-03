@@ -33,14 +33,10 @@ class MyDataset(Dataset):
         self.masks_dict = read_all_masks(args.image_path, self.train_test_id)
         self.pretrained = args.pretrained
         self.attribute = args.attribute
-        self.mask_use = args.mask_use
         self.augment_list = args.augment_list
         self.prob = args.prob
         self.train = train
-        self.cell = args.cell
-        self.cell_size = args.cell_size
         self.normalize = args.normalize
-        self.pair = args.pair
         self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
 
         self.n = self.train_test_id.shape[0]
@@ -85,9 +81,8 @@ class MyDataset(Dataset):
 
         image = np.array(image)
 
-        if self.mask_use:
-            for i in range(mask.shape[-1]):
-                mask[:, :, i] = np.array(mask_pil_array[i])
+        for i in range(mask.shape[-1]):
+            mask[:, :, i] = np.array(mask_pil_array[i])
 
         mask[mask==0] = -1
 
@@ -97,13 +92,10 @@ class MyDataset(Dataset):
 
         name = self.train_test_id.iloc[index].ID
 
-        # Load image and masks from npy
         image = self.images_dict[name]
         image = (image / 255.0)
-        if self.mask_use:
-            mask = self.masks_dict[name][:, :, self.indexes]
-        else:
-            mask = image
+
+        mask = self.masks_dict[name][:, :, self.indexes]
 
         if self.train == 'train':
             if self.augment_list:
@@ -115,28 +107,12 @@ class MyDataset(Dataset):
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
 
-        mask[mask == 0] = -1
-
-        if self.mask_use:
-            if self.train == 'valid':
-                mask.fill(0.)
-            image_with_mask = np.dstack((image, mask))
-        else:
-            image_with_mask = image
-
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        image_with_mask = channels_first(image_with_mask)
+        image = channels_first(image)
+        mask = channels_first(mask)
 
-        if self.pair and self.train == 'train':
-            image_with_mask_zero = image_with_mask.copy()
-            image_with_mask_zero[3:].fill(0.)
-            return npy_to_float_tensor(image_with_mask), \
-                   npy_to_float_tensor(image_with_mask_zero), \
-                   npy_to_float_tensor(labels),\
-                   name
-
-        return npy_to_float_tensor(image_with_mask), npy_to_float_tensor(labels), name
+        return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train: str = 'train', shuffle: bool = True) -> DataLoader:
