@@ -86,6 +86,7 @@ class ResUNet(nn.Module):
         z = self.up3((z, x3))  # -> 56x56x256
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))   # -> 224x224x64
+        z = self.conv_segm(z)  # -> 224x224xn
 
         x = self.avgpool(x6)   # classification
         x = torch.flatten(x, 1)
