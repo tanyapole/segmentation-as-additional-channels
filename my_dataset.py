@@ -15,6 +15,7 @@ class MyDataset(Dataset):
         self.image_path = args.image_path
         self.pretrained = args.pretrained
         self.attribute = args.attribute
+        self.normalize = args.normalize
         self.train = train
         self.n = self.train_test_id.shape[0]
 
@@ -28,7 +29,7 @@ class MyDataset(Dataset):
 
         image = np.load(os.path.join(path, '%s.npy' % name[5:]))
         image = (image / 255.0)
-        if self.pretrained and False:
+        if self.pretrained and self.normalize:
             mean = np.array([0.485, 0.456, 0.406])
             std = np.array([0.229, 0.224, 0.225])
             image = (image - mean) / std

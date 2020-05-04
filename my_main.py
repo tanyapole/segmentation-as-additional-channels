@@ -33,6 +33,7 @@ if __name__ == "__main__":
     arg('--cuda1', action='store_true')
     arg('--workers', type=int, default=1)
     arg('--optimizer', type=str, choices=['adam', 'sgd'])
+    arg('--normalize', action='store_true')
     args = parser.parse_args()
 
     root = Path(args.root)
