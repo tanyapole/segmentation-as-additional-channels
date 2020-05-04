@@ -102,10 +102,6 @@ class ResUNet(nn.Module):
 
 def create_model(args):
 
-    model = ResUNet(args.pretrained, len(args.attribute))
-
-    if args.freezing:
-        for param in model.parameters():
-            param.requires_grad = False
+    model = ResUNet(args.pretrained, len(args.attribute), args.resume, args.model_path, args.N)
 
     return model
