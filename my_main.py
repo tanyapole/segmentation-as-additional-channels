@@ -30,7 +30,6 @@ if __name__ == "__main__":
     arg('--save_model', action='store_true')
     arg('--model_path', type=str, default='/data/ISIC/models/')
     arg('--attribute', nargs='+', default=[])
-    arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')
     arg('--workers', type=int, default=1)
     arg('--optimizer', type=str, choices=['adam', 'sgd'])
