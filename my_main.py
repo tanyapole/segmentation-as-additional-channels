@@ -25,7 +25,6 @@ if __name__ == "__main__":
     arg('--n_epochs', type=int, default=1)
     arg('--prob', type=float, nargs='*', default=[0.1])
     arg('--attribute', nargs='+', default=[])
-    arg('--freezing', action='store_true')
     arg('--cuda1', action='store_true')
     arg('--workers', type=int, default=1)
     arg('--resume', action='store_true')
