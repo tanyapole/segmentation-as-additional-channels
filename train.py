@@ -36,7 +36,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     if args.show_model:
         print(model)
 
-    model = nn.DataParallel(model)
+    # model = nn.DataParallel(model)
     model.to(device)
 
     criterion = torch.nn.BCEWithLogitsLoss()
