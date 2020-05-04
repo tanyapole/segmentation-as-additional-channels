@@ -43,7 +43,7 @@ class UnetUpBlock(nn.Module):
 
 class ResUNet(nn.Module):
 
-    def __init__(self, pretrained, classes):
+    def __init__(self, pretrained, n_class):
         super().__init__()
         base_model = models.resnet50(pretrained=pretrained)
 
@@ -57,7 +57,7 @@ class ResUNet(nn.Module):
         self.down6 = base_model.layer4
 
         self.avgpool = base_model.avgpool
-        self.fc = nn.Linear(2048, classes)
+        self.fc = nn.Linear(2048, n_class)
 
         self.MiddleBridge = nn.Sequential(*[ConvBlock(2048, 2048),
                                             ConvBlock(2048, 2048)])
@@ -69,6 +69,7 @@ class ResUNet(nn.Module):
                                up_conv_in_channels=256, up_conv_out_channels=128)
         self.up5 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
                                up_conv_in_channels=128, up_conv_out_channels=64)
+        self.conv_segm = nn.Conv2d(64, n_class, 1)
 
     def forward(self, x):
         x1 = self.down1(x)   # -> 112x112x64
