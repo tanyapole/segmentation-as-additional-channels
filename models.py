@@ -43,9 +43,14 @@ class UnetUpBlock(nn.Module):
 
 class ResUNet(nn.Module):
 
-    def __init__(self, pretrained, n_class):
+    def __init__(self, pretrained: bool, n_class: int, resume: bool=False, model_path : str='', N: int=0):
         super().__init__()
+
         base_model = models.resnet50(pretrained=pretrained)
+        base_model.fc = nn.Linear(2048, n_class)
+        if resume:
+            checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+            base_model.load_state_dict(checkpoint['model'])
 
         self.down1 = nn.Sequential(*[base_model.conv1,
                                      base_model.bn1,
@@ -57,7 +62,7 @@ class ResUNet(nn.Module):
         self.down6 = base_model.layer4
 
         self.avgpool = base_model.avgpool
-        self.fc = nn.Linear(2048, n_class)
+        self.fc = base_model.fc
 
         self.MiddleBridge = nn.Sequential(*[ConvBlock(2048, 2048),
                                             ConvBlock(2048, 2048)])
