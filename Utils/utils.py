@@ -32,10 +32,10 @@ def print_save_results(args, results, root, i, time):
 
 
 def print_update(metrics, results: pd.DataFrame, args, mode: str) -> pd.DataFrame:
-    print('''Epoch: {} Loss: {:.6f} Pair_loss{:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
+    print('''Epoch: {} Loss: {:.6f} bce1_loss{:.6f} Accuracy: {:.4f} Precision: {:.4f} Recall: {:.4f} F1: {:.4f} F1_labeled {} 
              Time: {:.4f}'''.format(metrics['epoch'],
                                     metrics['loss'],
-                                    metrics['bce_loss'],
+                                    metrics['bce1_loss'],
                                     metrics['accuracy'],
                                     metrics['precision'],
                                     metrics['recall'],
