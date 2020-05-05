@@ -121,10 +121,8 @@ def make_loader(train_test_id: pd.DataFrame, args, train: str = 'train', shuffle
                          args=args,
                          train=train)
 
-    batch_size = args.batch_size if train == 'train' else args.batch_size*10
-
     data_loader = DataLoader(data_set,
-                             batch_size=batch_size,
+                             batch_size=args.batch_size,
                              shuffle=shuffle,
                              num_workers=args.workers,
                              pin_memory=True
