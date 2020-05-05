@@ -25,7 +25,7 @@ def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     return train_test_id
 
 
-def print_save_results(args, results: pd.DataFrame, i: int, time: str, postfix: str):
+def print_save_results(args, results: pd.DataFrame, time: str, postfix: str):
     print('номер эксперимента {}'.format(args.N))
     path = 'Results/{}'.format(time)
     name = 'results_{}.csv'.format(postfix)
