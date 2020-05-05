@@ -104,7 +104,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
 
-            if args.save_model and train_type == PRETRAIN:
+            if train_type == PRETRAIN:
                 if temp_f1 > best_f1:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
