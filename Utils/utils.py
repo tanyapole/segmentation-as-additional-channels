@@ -18,8 +18,8 @@ def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     train_test_id.loc[:, 'Split'] = ''
     if train_type == PRETRAIN:
         train_test_id.loc[:TRAIN_TRAIN_NUMBER, 'Split'] = 'train'
-        train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER + TRAIN_VALID_NUMBER, 'Split'] = 'valid'
-        print(TRAIN_TRAIN_NUMBER, TRAIN_TRAIN_NUMBER + TRAIN_VALID_NUMBER)
+        # -1 because in pd.loc start and end of indexing are included
+        train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER + TRAIN_VALID_NUMBER - 1, 'Split'] = 'valid'
     else:
         train_test_id.loc[:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, 'Split'] = 'train'
         train_test_id.loc[TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER:, 'Split'] = 'valid'
