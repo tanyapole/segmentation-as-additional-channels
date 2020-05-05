@@ -15,7 +15,6 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     arg = parser.add_argument
-    arg('--root', type=str, default='runs/debug')
     arg('--N', type=int, default=1)
     arg('--pretrained', action='store_true')
     arg('--lr', type=float, default=0.0001)
@@ -29,9 +28,6 @@ if __name__ == "__main__":
     arg('--model_path', type=str, default='/Data/model/')
     arg('--normalize', action='store_true')
     args = parser.parse_args()
-
-    root = Path(args.root)
-    root.mkdir(exist_ok=True, parents=True)
 
     results1 = pd.DataFrame()
     results2 = pd.DataFrame()
