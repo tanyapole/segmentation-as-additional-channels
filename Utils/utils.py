@@ -19,8 +19,8 @@ def read_split_data(SEED: int, border: int = 1800) -> pd.DataFrame:
 
 
 def print_save_results(args, results, root, i, time):
-    print('заморозка {}, lr {}, номер эксперимента {}'
-          .format(args.freezing, args.lr, args.N))
+    print('lr {}, номер эксперимента {}'
+          .format(args.lr, args.N))
     root.joinpath('params_{}_num {} .json'.format(time, i)).write_text(
         json.dumps(vars(args), indent=True, sort_keys=True))
     path = 'Results/{}'.format(time)
