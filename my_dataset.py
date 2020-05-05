@@ -17,7 +17,6 @@ class MyDataset(Dataset):
         self.image_path = args.image_path
         self.pretrained = args.pretrained
         self.attribute = args.attribute
-        self.prob = args.prob
         self.train = train
         self.normalize = args.normalize
         self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
