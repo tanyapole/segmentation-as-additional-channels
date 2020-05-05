@@ -15,7 +15,7 @@ def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     random.seed(SEED)
     random.shuffle(indexes)
     train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
-    train_test_id.loc[:TRAIN_TRAIN_NUMBER, 'Split'] = ''
+    train_test_id.loc[:, 'Split'] = ''
     if train_type == PRETRAIN:
         train_test_id.loc[:TRAIN_TRAIN_NUMBER, 'Split'] = 'train'
         train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER + TRAIN_VALID_NUMBER, 'Split'] = 'valid'
@@ -25,7 +25,7 @@ def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     return train_test_id
 
 
-def print_save_results(args, results: pd.DataFrame, root, i: int, time: str, postfix: str):
+def print_save_results(args, results: pd.DataFrame, i: int, time: str, postfix: str):
     print('номер эксперимента {}'.format(args.N))
     path = 'Results/{}'.format(time)
     name = 'results_{}.csv'.format(postfix)
