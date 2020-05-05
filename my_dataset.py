@@ -50,7 +50,7 @@ class MyDataset(Dataset):
             mask = channels_first(mask)
             return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
         else:
-            return npy_to_float_tensor(image), [None], npy_to_float_tensor(labels), name
+            return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train_type: str,
