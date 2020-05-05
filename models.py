@@ -1,7 +1,8 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
 from torchvision import models
+
+from Utils.constants import YNET
 
 
 class ConvBlock(nn.Module):
@@ -48,9 +49,9 @@ class ResUNet(nn.Module):
 
         base_model = models.resnet50(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
-        if resume:
-            checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-            base_model.load_state_dict(checkpoint['model'])
+
+        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])
 
         self.down1 = nn.Sequential(*[base_model.conv1,
                                      base_model.bn1,
@@ -100,8 +101,12 @@ class ResUNet(nn.Module):
         return x, z
 
 
-def create_model(args):
+def create_model(args, train_type):
 
-    model = ResUNet(args.pretrained, len(args.attribute), args.resume, args.model_path, args.N)
+    if train_type == YNET:
+        model = ResUNet(args.pretrained, len(args.attribute), args.resume, args.model_path, args.N)
+    else:
+        model = models.resnet50(pretrained=args.pretrained)
+        model.fc = nn.Linear(2048, len(args.attribute))
 
     return model
