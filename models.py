@@ -50,8 +50,8 @@ class ResUNet(nn.Module):
         base_model = models.resnet50(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
 
-        """checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-        base_model.load_state_dict(checkpoint['model'])"""
+        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])
 
         self.down1 = nn.Sequential(*[base_model.conv1,
                                      base_model.bn1,
