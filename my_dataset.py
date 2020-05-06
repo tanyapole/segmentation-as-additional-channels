@@ -53,7 +53,7 @@ class MyDataset(Dataset):
             mask = channels_first(mask)
             return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
         else:
-            image, mask = _augment_one(self.transforms, image)
+            image = _augment_one(self.transforms, image)
             return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
 
 
