@@ -46,7 +46,7 @@ with torch.no_grad():
             print(s[s == 1].shape, s[s == 0].shape, 'class %d'%i, clsf[:,i], 'true_labels ',labels_batch[:,i])
         loss = loss1 = loss2 = torch.zeros(1).to(device)
         metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
-    print(metrics.valid.compute())
+    print(metrics.valid.compute(ep=0, epoch_time=0.1))
 del model
 
 """path = 'D:/Data/albums/images_npy/'
