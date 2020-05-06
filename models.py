@@ -65,10 +65,10 @@ class ResUNet(nn.Module):
         self.avgpool = base_model.avgpool
         self.fc = base_model.fc
 
-        self.MiddleBridge = nn.Sequential(*[ConvBlock(2048, 2048),
-                                            ConvBlock(2048, 2048)])
+        self.MiddleBridge = nn.Sequential(*[ConvBlock(1024, 1024),
+                                            ConvBlock(1024, 1024)])
 
-        self.up1 = UnetUpBlock(2048, 1024)
+        # self.up1 = UnetUpBlock(2048, 1024)
         self.up2 = UnetUpBlock(1024, 512)
         self.up3 = UnetUpBlock(512, 256)
         self.up4 = UnetUpBlock(in_channels=128 + 64, out_channels=128,
@@ -85,10 +85,10 @@ class ResUNet(nn.Module):
         x5 = self.down5(x4)  # -> 14x14x1024
         x6 = self.down6(x5)  # -> 7x7x2048
 
-        b = self.MiddleBridge(x6)
+        b = self.MiddleBridge(x5)
 
-        z = self.up1((b, x5))  # -> 14x14x1024
-        z = self.up2((z, x4))  # -> 28x28x512
+        # z = self.up1((b, x5))  # -> 14x14x1024
+        z = self.up2((b, x4))  # -> 28x28x512
         z = self.up3((z, x3))  # -> 56x56x256
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))   # -> 224x224x64

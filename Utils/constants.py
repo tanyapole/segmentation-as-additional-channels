@@ -6,8 +6,8 @@ ALL_ATTRIBUTES = ['attribute_globules', 'attribute_milia_like_cyst', 'attribute_
 IMAGE_PATH = 'images_npy'
 MASK_PATH = 'masks_npy'
 
-K1 = 1
-K2 = 50
+K1 = 100
+K2 = 100
 
 TRAIN_TRAIN_NUMBER = 1600
 TRAIN_VALID_NUMBER = 400
