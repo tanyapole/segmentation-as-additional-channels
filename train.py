@@ -1,6 +1,7 @@
 import time
 
 import pandas as pd
+import numpy as np
 import torch
 import torch.nn as nn
 from pathlib import Path
@@ -43,7 +44,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
     best_f1 = 0
-
+    best_train_f1 = 0
     for ep in range(epochs):
         try:
             start_time = time.time()
@@ -65,7 +66,10 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 if train_type == YNET:
                     masks_batch = masks_batch.to(device)
                     clsf_output, segm_output = model(image_batch)
-                    # print(clsf_output.shape, segm_output.shape, masks_batch.shape)
+                    segm = (segm_output.data.cpu().numpy() > 0) * 1
+                    for i in range(2):
+                        s = segm[:,i,:,:].ravel()
+                        print(np.unique(s), s[s==1].shape, s[s==0].shape)
                     loss2 = criterion(segm_output, masks_batch)
                 else:
                     clsf_output = model(image_batch)
@@ -77,6 +81,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 metrics.train.update(labels_batch, clsf_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
+            train_f1 = computed_metr['f1_score']
             results = print_update(computed_metr, results, args, 'train', train_type)
             metrics.train.reset()
 
@@ -109,7 +114,11 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_f1 = temp_f1
-
+            if train_type == YNET:
+                if train_f1 > best_train_f1:
+                    name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
+                    save_weights(model, name, ep, optimizer)
+                    best_train_f1 = temp_f1
         except KeyboardInterrupt:
             return
     # writer.close()

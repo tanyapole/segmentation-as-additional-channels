@@ -6,7 +6,15 @@ import torch
 import pandas as pd
 import numpy as np
 
-from Utils.constants import TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, PRETRAIN
+from Utils.constants import TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, PRETRAIN, MASK_PATH
+
+
+def calculate_mean_square(args, mask_names: np.array):
+    mean = np.zeros(5)
+    for name in mask_names:
+        mask = np.load(os.path.join(args.image_path, MASK_PATH, name))
+        mean += [mask[:,:,i] for i in range(len(args.attribute))]
+    return mean / len(mask_names)
 
 
 def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
