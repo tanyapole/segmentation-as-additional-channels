@@ -66,10 +66,10 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 if train_type == YNET:
                     masks_batch = masks_batch.to(device)
                     clsf_output, segm_output = model(image_batch)
-                    segm = (segm_output.data.cpu().numpy() > 0) * 1
+                    """segm = (segm_output.data.cpu().numpy() > 0) * 1
                     for i in range(2):
                         s = segm[:,i,:,:].ravel()
-                        print(np.unique(s), s[s==1].shape, s[s==0].shape)
+                        print(np.unique(s), s[s==1].shape, s[s==0].shape)"""
                     loss2 = criterion(segm_output, masks_batch)
                 else:
                     clsf_output = model(image_batch)
