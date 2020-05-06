@@ -40,9 +40,10 @@ with torch.no_grad():
         labels_batch = labels_batch.to(device)
         clsf_output, segm_output = model(image_batch)
         segm = (segm_output.data.cpu().numpy() > 0) * 1
+        clsf = (clsf_output.data.cpu().numpy() > 0) * 1
         for i in range(2):
             s = segm[:, i, :, :].ravel()
-            print(np.unique(s), s[s == 1].shape, s[s == 0].shape)
+            print(s[s == 1].shape, s[s == 0].shape, 'class %d'%i, clsf[:,i], 'true_labels ',labels_batch[:,i])
         loss = loss1 = loss2 = torch.zeros(1).to(device)
         metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
     print(metrics.valid.compute())
