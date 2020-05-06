@@ -43,7 +43,7 @@ with torch.no_grad():
         for i in range(2):
             s = segm[:, i, :, :].ravel()
             print(np.unique(s), s[s == 1].shape, s[s == 0].shape)
-        loss = loss1 = loss2 = torch.zeros(0).to(device)
+        loss = loss1 = loss2 = torch.zeros(1).to(device)
         metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
     print(metrics.valid.compute())
 del model
