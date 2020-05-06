@@ -45,15 +45,15 @@ class MyDataset(Dataset):
 
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        image = channels_first(image)
-
         if self.train_type == YNET:
             mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))[:, :, self.indexes]
             image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)
+            image = channels_first(image)
             return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
         else:
             image = _augment_one(self.transforms, image)
+            image = channels_first(image)
             return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
 
 
