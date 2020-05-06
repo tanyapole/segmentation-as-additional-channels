@@ -3,8 +3,9 @@ import os
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
+from albumentations import Compose, RandomRotate90, Flip, Transpose, ShiftScaleRotate
 
-from Utils.utils import npy_to_float_tensor, channels_first
+from Utils.utils import npy_to_float_tensor, channels_first, _augment_duo, _augment_one
 from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH, YNET
 
 
@@ -20,6 +21,7 @@ class MyDataset(Dataset):
         self.train = train
         self.normalize = args.normalize
         self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
+        self.transforms = Compose([RandomRotate90(), Flip(), Transpose(), ShiftScaleRotate()])
 
         self.n = self.train_test_id.shape[0]
         print(self.n, train_type, train)
@@ -47,9 +49,11 @@ class MyDataset(Dataset):
 
         if self.train_type == YNET:
             mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))[:, :, self.indexes]
+            image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)
             return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
         else:
+            image, mask = _augment_one(self.transforms, image)
             return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
 
 

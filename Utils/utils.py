@@ -7,6 +7,17 @@ import pandas as pd
 import numpy as np
 
 from Utils.constants import TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, PRETRAIN, MASK_PATH
+from albumentations import DualTransform
+
+
+def _augment_duo(tfm: DualTransform, img: np.array, mask: np.array):
+    augmented = tfm(image=img, mask=mask)
+    return augmented['image'], augmented['mask']
+
+
+def _augment_one(tfm: DualTransform, img: np.array):
+    augmented = tfm(image=img)
+    return augmented['image']
 
 
 def calculate_mean_square(args, mask_names: np.array):
