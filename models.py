@@ -44,14 +44,14 @@ class UnetUpBlock(nn.Module):
 
 class ResUNet(nn.Module):
 
-    def __init__(self, pretrained: bool, n_class: int, resume: bool=False, model_path : str='', N: int=0):
+    def __init__(self, pretrained: bool, n_class: int, model_path : str='', N: int=0):
         super().__init__()
 
         base_model = models.resnet50(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
 
-        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-        base_model.load_state_dict(checkpoint['model'])
+        """checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])"""
 
         self.down1 = nn.Sequential(*[base_model.conv1,
                                      base_model.bn1,
@@ -104,7 +104,7 @@ class ResUNet(nn.Module):
 def create_model(args, train_type):
 
     if train_type == YNET:
-        model = ResUNet(args.pretrained, len(args.attribute), args.resume, args.model_path, args.N)
+        model = ResUNet(args.pretrained, len(args.attribute), args.model_path, args.N)
     else:
         model = models.resnet50(pretrained=args.pretrained)
         model.fc = nn.Linear(2048, len(args.attribute))

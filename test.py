@@ -1,7 +1,8 @@
 from torchvision import models
 from torch import nn
 import numpy as np
-from Utils.constants import IMAGE_PATH, MASK_PATH, ALL_ATTRIBUTES
+from Utils.constants import IMAGE_PATH, MASK_PATH, ALL_ATTRIBUTES, YNET, SEED_LIST
+from Utils.utils import read_split_data
 import os
 from torch.optim import Adam
 import pandas as pd
@@ -9,38 +10,52 @@ import torch
 
 from models import create_model
 from my_dataset import make_loader
+from metrics import Metrics
 
+device='cuda'
 class Args:
     def __init__(self):
-        self.attribute = ALL_ATTRIBUTES
-        print(self.attribute)
-        self.model = 'resnet50'
-        self.mask_use = True
-        self.freezing = False
+        self.attribute = ['attribute_globules', 'attribute_milia_like_cyst']
         self.pretrained = False
-        self.batch_norm = False
         self.optimizer = 'adam'
         self.lr = 0.0001
-        self.batch_size = 2
+        self.batch_size = 1
         self.workers = 1
-        self.cell = True
-        self.cell_size = 14
-        self.prob = 0.2
-        self.image_path = 'D:/Data/albums/'
+        self.image_path = '/data/ISIC/'
         self.augment_list = []
-        self.normalize = False
+        self.normalize = True
+        self.model_path = 'D:/Data/'
+        self.N = 0
 args = Args()
-model = models.resnet50()
-#print(model)
-print(model)
-path = 'D:/Data/albums/images_npy/'
+model = create_model(args, train_type=YNET)
+checkpoint = torch.load('/data/model_ynet_pretrain_2cl/' + 'model_ynet_0.pt')
+model.load_state_dict(checkpoint['model'])
+model.to(device)
+train_test_id = read_split_data(SEED=SEED_LIST[0], train_type=YNET)
+val_dl = make_loader(train_test_id, args, train_type=YNET, train='valid')
+metrics = Metrics(args)
+with torch.no_grad():
+    for i, (image_batch, masks_batch, labels_batch, names) in enumerate(val_dl):
+        image_batch = image_batch.to(device)
+        labels_batch = labels_batch.to(device)
+        clsf_output, segm_output = model(image_batch)
+        segm = (segm_output.data.cpu().numpy() > 0) * 1
+        for i in range(2):
+            s = segm[:, i, :, :].ravel()
+            print(np.unique(s), s[s == 1].shape, s[s == 0].shape)
+        loss = loss1 = loss2 = torch.zeros(0).to(device)
+        metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
+    print(metrics.valid.compute())
+del model
+
+"""path = 'D:/Data/albums/images_npy/'
 name = os.listdir(path)[0]
 img = np.load(path + name)
 img = np.moveaxis(img, -1, 0)
 timg = torch.from_numpy(img).float()
 btimg = torch.unsqueeze(timg, dim=0)
 
-model(btimg)
+model(btimg)"""
 """train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
 path = 'D:/Data/albums/'
 batch =np.zeros([2, 224, 224, 8])
