@@ -66,7 +66,10 @@ class ResUNet(nn.Module):
         self.bn = nn.BatchNorm2d(512)
         self.relu = nn.ReLU()
         self.avgpool = base_model.avgpool
-        self.fc = base_model.fc
+        self.fc1 = nn.Linear(512, 128, bias=False)
+        self.bn1 = nn.BatchNorm1d(128)
+        self.relu1 = nn.ReLU()
+        self.fc2 = nn.Linear(128, n_class, bias=False)
 
         """self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
                                             ConvBlock(512, 512)])"""
@@ -106,7 +109,10 @@ class ResUNet(nn.Module):
         x = self.relu(x)
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        x = self.fc(x)
+        x = self.fc1(x)
+        x = self.bn1(x)
+        x = self.relu1(x)
+        x = self.fc2(x)
 
         return x, z
 
