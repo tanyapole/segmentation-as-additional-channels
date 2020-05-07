@@ -65,11 +65,13 @@ class ResUNet(nn.Module):
         self.avgpool = base_model.avgpool
         self.fc = base_model.fc
 
-        self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
-                                            ConvBlock(512, 512)])
+        """self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
+                                            ConvBlock(512, 512)])"""
+        self.Bridge1 = ConvBlock(2048, 2048)
+        self.Bridge2 = ConvBlock(2048, 2048)
 
-        # self.up1 = UnetUpBlock(2048, 1024)
-        # self.up2 = UnetUpBlock(1024, 512)
+        self.up1 = UnetUpBlock(2048, 1024)
+        self.up2 = UnetUpBlock(1024, 512)
         self.up3 = UnetUpBlock(512, 256)
         self.up4 = UnetUpBlock(in_channels=128 + 64, out_channels=128,
                                up_conv_in_channels=256, up_conv_out_channels=128)
@@ -85,16 +87,18 @@ class ResUNet(nn.Module):
         x5 = self.down5(x4)  # -> 14x14x1024
         x6 = self.down6(x5)  # -> 7x7x2048
 
-        b = self.MiddleBridge(x4)
+        # b = self.MiddleBridge(x4)
+        b = self.Bridge1(x6)
+        z = self.Bridge2(b)
 
-        # z = self.up1((b, x5))  # -> 14x14x1024
-        # z = self.up2((b, x4))  # -> 28x28x512
-        z = self.up3((b, x3))  # -> 56x56x256
+        z = self.up1((z, x5))  # -> 14x14x1024
+        z = self.up2((z, x4))  # -> 28x28x512
+        z = self.up3((z, x3))  # -> 56x56x256
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))   # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
 
-        x = self.avgpool(x6)   # classification
+        x = self.avgpool(b)   # classification
         x = torch.flatten(x, 1)
         x = self.fc(x)
 
