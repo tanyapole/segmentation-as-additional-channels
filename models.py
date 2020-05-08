@@ -42,7 +42,7 @@ class UnetUpBlock(nn.Module):
         return u
 
 
-class ResUNet(nn.Module):
+class ResYNet(nn.Module):
 
     def __init__(self, pretrained: bool, n_class: int, model_path : str='', N: int=0):
         super().__init__()
@@ -62,9 +62,9 @@ class ResUNet(nn.Module):
         self.down5 = base_model.layer3
         self.down6 = base_model.layer4
 
-        self.conv1x1 = nn.Conv2d(2048, 512, kernel_size=1)
-        self.bn = nn.BatchNorm2d(512)
-        self.relu = nn.ReLU()
+        #self.conv1x1 = nn.Conv2d(2048, 512, kernel_size=1)
+        #self.bn = nn.BatchNorm2d(512)
+        #self.relu = nn.ReLU()
         self.avgpool = base_model.avgpool
         self.fc1 = nn.Linear(512, 512, bias=False)
         self.bn1 = nn.BatchNorm1d(512)
@@ -104,10 +104,10 @@ class ResUNet(nn.Module):
         z = self.up5((z, x))   # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
 
-        x = self.conv1x1(b)   # classification
-        x = self.bn(x)
-        x = self.relu(x)
-        x = self.avgpool(x)
+        # x = self.conv1x1(x4)   # classification
+        # x = self.bn(x)
+        # x = self.relu(x)
+        x = self.avgpool(x4)
         x = torch.flatten(x, 1)
         x = self.fc1(x)
         x = self.bn1(x)
@@ -120,7 +120,7 @@ class ResUNet(nn.Module):
 def create_model(args, train_type):
 
     if train_type == YNET:
-        model = ResUNet(args.pretrained, len(args.attribute), args.model_path, args.N)
+        model = ResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
     else:
         model = models.resnet50(pretrained=args.pretrained)
         model.fc = nn.Linear(2048, len(args.attribute))
