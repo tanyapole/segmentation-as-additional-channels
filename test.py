@@ -28,7 +28,7 @@ class Args:
         self.N = 1
 args = Args()
 model = create_model(args, train_type=YNET)
-checkpoint = torch.load('/data/ISIC/model_ynet_pretrain_2cl/' + 'model_ynet_0.pt')
+checkpoint = torch.load('/data/ISIC/model_ynet_pretrain_2cl/' + 'model_ynet_2.pt')
 model.load_state_dict(checkpoint['model'])
 model.to(device)
 train_test_id = read_split_data(SEED=SEED_LIST[0], train_type=YNET)
