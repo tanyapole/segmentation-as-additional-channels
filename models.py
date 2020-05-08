@@ -50,8 +50,8 @@ class ResYNet(nn.Module):
         base_model = models.resnet50(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
 
-        """checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-        base_model.load_state_dict(checkpoint['model'])"""
+        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])
 
         self.down1 = nn.Sequential(*[base_model.conv1,
                                      base_model.bn1,
@@ -117,6 +117,60 @@ class ResYNet(nn.Module):
         return x, z
 
 
+class SResYNet(nn.Module):
+
+    def __init__(self, pretrained: bool, n_class: int, model_path : str='', N: int=0):
+        super().__init__()
+
+        base_model = Unet(pretrained, n_class)
+        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])
+
+        self.down1 = base_model.down1
+        self.down2 = base_model.down2
+        self.down3 = base_model.down3
+        self.down4 = base_model.down4
+        self.down5 = base_model.down5
+        self.down6 = base_model.down6
+
+        self.clsf = nn.Sequential(*[ConvBlock(512, 256, kernel_size=1),
+                                    base_model.avgpool,
+                                    nn.Linear(256, 256, bias=False),
+                                    nn.BatchNorm1d(256),
+                                    nn.ReLU(),
+                                    nn.Linear(256, n_class, bias=False)])
+
+        self.MiddleBridge = base_model.MiddleBridge
+
+        self.up1 = base_model.up1
+        self.up2 = base_model.up2
+        self.up3 = base_model.up3
+        self.up4 = base_model.up4
+        self.up5 = base_model.up5
+        self.conv_segm = nn.Sequential(*[ConvBlock(64, 16, kernel_size=1),
+                                         nn.Conv2d(16, n_class, 1)])
+
+    def forward(self, x):
+        x1 = self.down1(x)   # -> 112x112x64
+        x2 = self.down2(x1)  # -> 56x56x64
+        x3 = self.down3(x2)  # -> 56x56x256
+        x4 = self.down4(x3)  # -> 28x28x512
+        x5 = self.down5(x4)  # -> 14x14x1024
+        x6 = self.down6(x5)  # -> 7x7x2048
+
+        b = self.MiddleBridge(x6)
+
+        z = self.up1((b, x5))  # -> 14x14x1024
+        z1 = self.up2((z, x4))  # -> 28x28x512
+        z = self.up3((z1, x3))  # -> 56x56x256
+        z = self.up4((z, x1))  # -> 112x112x128
+        z = self.up5((z, x))   # -> 224x224x64
+        z = self.conv_segm(z)  # -> 224x224xn
+
+        x = self.clsf(z1)
+
+        return x, z
+
 class Unet(nn.Module):
 
     def __init__(self, pretrained: bool, n_class: int):
@@ -144,7 +198,8 @@ class Unet(nn.Module):
                                up_conv_in_channels=256, up_conv_out_channels=128)
         self.up5 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
                                up_conv_in_channels=128, up_conv_out_channels=64)
-        self.conv_segm = nn.Conv2d(64, n_class, 1)
+        self.conv_segm = nn.Sequential(*[ConvBlock(64, 16, kernel_size=1),
+                                         nn.Conv2d(16, n_class, 1)])
 
     def forward(self, x):
 
@@ -164,7 +219,7 @@ class Unet(nn.Module):
         z = self.up5((z, x))  # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
 
-        return x, z
+        return z
 
 
 def create_model(args, train_type):
