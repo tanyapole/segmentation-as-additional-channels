@@ -71,8 +71,8 @@ class ResUNet(nn.Module):
         self.relu1 = nn.ReLU()
         self.fc2 = nn.Linear(512, n_class, bias=False)
 
-        self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
-                                            ConvBlock(512, 512)])
+        self.MiddleBridge = nn.Sequential(*[ConvBlock(2048, 2048),
+                                            ConvBlock(2048, 2048)])
         # self.Bridge1 = ConvBlock(2048, 2048)
         # self.Bridge2 = ConvBlock(2048, 2048)
 
