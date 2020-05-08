@@ -24,8 +24,8 @@ class Args:
         self.image_path = '/data/ISIC/'
         self.augment_list = []
         self.normalize = True
-        self.model_path = 'D:/Data/'
-        self.N = 0
+        self.model_path = '/data/ISIC/model_ynet_pretrain_2cl/'
+        self.N = 1
 args = Args()
 model = create_model(args, train_type=YNET)
 checkpoint = torch.load('/data/ISIC/model_ynet_pretrain_2cl/' + 'model_ynet_0.pt')

@@ -62,9 +62,9 @@ class ResYNet(nn.Module):
         self.down5 = base_model.layer3
         self.down6 = base_model.layer4
 
-        #self.conv1x1 = nn.Conv2d(2048, 512, kernel_size=1)
-        #self.bn = nn.BatchNorm2d(512)
-        #self.relu = nn.ReLU()
+        self.conv1x1 = nn.Conv2d(2048, 512, kernel_size=1)
+        self.bn = nn.BatchNorm2d(512)
+        self.relu = nn.ReLU()
         self.avgpool = base_model.avgpool
         self.fc1 = nn.Linear(512, 512, bias=False)
         self.bn1 = nn.BatchNorm1d(512)
@@ -104,10 +104,10 @@ class ResYNet(nn.Module):
         z = self.up5((z, x))   # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
 
-        # x = self.conv1x1(x4)   # classification
-        # x = self.bn(x)
-        # x = self.relu(x)
-        x = self.avgpool(x4)
+        x = self.conv1x1(b)   # classification
+        x = self.bn(x)
+        x = self.relu(x)
+        x = self.avgpool(x)
         x = torch.flatten(x, 1)
         x = self.fc1(x)
         x = self.bn1(x)
