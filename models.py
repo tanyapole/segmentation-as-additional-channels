@@ -62,19 +62,19 @@ class ResUNet(nn.Module):
         self.down5 = base_model.layer3
         self.down6 = base_model.layer4
 
-        self.conv1x1 = self.conv = nn.Conv2d(2048, 512, kernel_size=1)
+        self.conv1x1 = nn.Conv2d(2048, 512, kernel_size=1)
         self.bn = nn.BatchNorm2d(512)
         self.relu = nn.ReLU()
         self.avgpool = base_model.avgpool
-        self.fc1 = nn.Linear(512, 128, bias=False)
-        self.bn1 = nn.BatchNorm1d(128)
+        self.fc1 = nn.Linear(512, 512, bias=False)
+        self.bn1 = nn.BatchNorm1d(512)
         self.relu1 = nn.ReLU()
-        self.fc2 = nn.Linear(128, n_class, bias=False)
+        self.fc2 = nn.Linear(512, n_class, bias=False)
 
-        """self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
-                                            ConvBlock(512, 512)])"""
-        self.Bridge1 = ConvBlock(2048, 2048)
-        self.Bridge2 = ConvBlock(2048, 2048)
+        self.MiddleBridge = nn.Sequential(*[ConvBlock(512, 512),
+                                            ConvBlock(512, 512)])
+        # self.Bridge1 = ConvBlock(2048, 2048)
+        # self.Bridge2 = ConvBlock(2048, 2048)
 
         self.up1 = UnetUpBlock(2048, 1024)
         self.up2 = UnetUpBlock(1024, 512)
@@ -93,11 +93,11 @@ class ResUNet(nn.Module):
         x5 = self.down5(x4)  # -> 14x14x1024
         x6 = self.down6(x5)  # -> 7x7x2048
 
-        # b = self.MiddleBridge(x4)
-        b = self.Bridge1(x6)
-        z = self.Bridge2(b)
+        b = self.MiddleBridge(x6)
+        # b = self.Bridge1(x6)
+        # z = self.Bridge2(b)
 
-        z = self.up1((z, x5))  # -> 14x14x1024
+        z = self.up1((b, x5))  # -> 14x14x1024
         z = self.up2((z, x4))  # -> 28x28x512
         z = self.up3((z, x3))  # -> 56x56x256
         z = self.up4((z, x1))  # -> 112x112x128

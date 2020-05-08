@@ -38,7 +38,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
     model.to(device)
 
     criterion = torch.nn.BCEWithLogitsLoss()
-
+    criterion2 = torch.nn.BCEWithLogitsLoss()
     # writer = SummaryWriter()
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
@@ -70,7 +70,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     for i in range(2):
                         s = segm[:,i,:,:].ravel()
                         print(np.unique(s), s[s==1].shape, s[s==0].shape)"""
-                    loss2 = criterion(segm_output, masks_batch)
+                    loss2 = criterion2(segm_output, masks_batch)
                 else:
                     clsf_output = model(image_batch)
                     loss2 = torch.zeros(1).to(device)
@@ -94,7 +94,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     if train_type == YNET:
                         masks_batch = masks_batch.to(device)
                         clsf_output, segm_output = model(image_batch)
-                        loss2 = criterion(segm_output, masks_batch)
+                        loss2 = criterion2(segm_output, masks_batch)
                     else:
                         clsf_output = model(image_batch)
                         loss2 = torch.zeros(1).to(device)
