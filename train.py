@@ -43,7 +43,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
-    best_f1 = 0
+    best_jac = 0
     best_train_f1 = 0
     for ep in range(epochs):
         try:
@@ -102,20 +102,20 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
-            temp_f1 = computed_metr['f1_score_segm']
+            temp_jac = computed_metr['jaccard']
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
 
             if train_type == PRETRAIN:
-                if temp_f1 > best_f1:
+                if temp_jac > best_jac:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
-                    best_f1 = temp_f1
+                    best_jac = temp_jac
             if train_type == YNET:
                 if train_f1 > best_train_f1:
                     name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
-                    best_train_f1 = temp_f1
+                    best_train_f1 = train_f1
         except KeyboardInterrupt:
             return
     # writer.close()
