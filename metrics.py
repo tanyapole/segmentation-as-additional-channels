@@ -1,5 +1,12 @@
-from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix, jaccard_score
+from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import numpy as np
+
+
+def jaccard(y_true, y_pred):
+    intersection = np.sum(np.abs(y_true * y_pred))
+    sum_ = np.sum(np.abs(y_true) + np.abs(y_pred))
+    jac = (intersection ) / (sum_ - intersection + 1e-10)
+    return jac
 
 
 class Metric:
@@ -63,7 +70,7 @@ class Metric:
 
         print(np.unique(self.true_segm), np.unique(self.pred_segm)
               , self.true_segm.shape, self.pred_segm.shape)
-        jac = jaccard_score(self.true_segm, self.pred_segm)
+        jac = jaccard(self.true_segm, self.pred_segm)
 
         loss = sum(self.loss) / len(self.loss)
         bce1_loss = sum(self.bce1_loss) / len(self.bce1_loss)
