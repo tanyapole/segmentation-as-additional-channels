@@ -133,7 +133,7 @@ class SResYNet(nn.Module):
         self.down5 = base_model.down5
         self.down6 = base_model.down6
 
-        self.clsf = nn.Sequential(*[ConvBlock(512, 256, kernel_size=1),
+        self.clsf = nn.Sequential(*[ConvBlock(512, 256, kernel_size=1, padding=0),
                                     nn.AdaptiveAvgPool2d((1, 1)),
                                     nn.Linear(256, 256, bias=False),
                                     nn.BatchNorm1d(256),
