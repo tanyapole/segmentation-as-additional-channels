@@ -61,6 +61,8 @@ class Metric:
         rec  = sum(rec_l) / len(rec_l)
         f1   = sum(f1_l)  / len(f1_l)
 
+        print(np.unique(self.true_segm), np.unique(self.pred_segm)
+              , self.true_segm.shape, self.pred_segm.shape)
         jac = jaccard_score(self.true_segm, self.pred_segm, average='macro')
 
         loss = sum(self.loss) / len(self.loss)
