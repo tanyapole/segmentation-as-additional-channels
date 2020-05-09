@@ -26,6 +26,7 @@ class Metric:
 
         ys_true = (ys_true.view(ys_true.shape[0], -1).data.cpu().numpy() > 0) * 1
         ys_pred = ys_pred.view(ys_pred.shape[0], -1).data.cpu().numpy()
+        print(ys_pred.shape, ys_true)
         self.conf_matrix_s += multilabel_confusion_matrix(ys_true, ys_pred)
         #print(self.conf_matrix)
         self.loss.append(loss)

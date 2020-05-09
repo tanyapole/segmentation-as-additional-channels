@@ -87,21 +87,22 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 for i, (image_batch, masks_batch, labels_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
                     labels_batch = labels_batch.to(device)
+                    masks_batch = masks_batch.to(device)
                     if train_type == YNET:
-                        masks_batch = masks_batch.to(device)
                         clsf_output, segm_output = model(image_batch)
-                        loss2 = criterion2(segm_output, masks_batch)
+                        loss2 = criterion2(clsf_output, labels_batch)
                     else:
-                        clsf_output = model(image_batch)
+                        segm_output = model(image_batch)
+                        clsf_output = labels_batch.clone().detach()
                         loss2 = torch.zeros(1).to(device)
                     if isinstance(args.attribute, str):
                         labels_batch = torch.reshape(labels_batch, (-1, 1))
-                    loss1 = criterion(clsf_output, labels_batch)
+                    loss1 = criterion(segm_output, masks_batch)
                     loss = loss1 + loss2
-                    metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
+                    metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
-            temp_f1 = computed_metr['f1_score']
+            temp_f1 = computed_metr['f1_score_segm']
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
 

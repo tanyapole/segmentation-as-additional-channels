@@ -219,7 +219,7 @@ class Unet(nn.Module):
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))  # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
-        print(z.shape)
+
         return z
 
 
