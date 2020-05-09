@@ -9,6 +9,7 @@ class Metric:
         self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
         self.true_segm = np.array([])
         self.pred_segm = np.array([])
+        self.concat = False
         self.loss = []
         self.bce1_loss = []
         self.bce2_loss = []
@@ -28,9 +29,10 @@ class Metric:
         ys_true = (ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy() > 0) * 1
         ys_pred = ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy()
         print(ys_pred.shape, ys_true.shape)
-        if not self.true_segm and not self.pred_segm:
+        if not self.concat:
             self.true_segm = ys_true
             self.pred_segm = ys_pred
+            self.concat = True
         else:
             self.true_segm = np.concatenate([self.true_segm, ys_true], axis=0)
             self.pred_segm = np.concatenate([self.pred_segm, ys_pred], axis=0)
@@ -86,6 +88,7 @@ class Metric:
         self.conf_matrix = np.zeros([self.conf_matrix.shape[0], 2, 2])
         self.true_segm = np.array([])
         self.pred_segm = np.array([])
+        self.concat = False
         self.loss = []
         self.bce_loss = []
         self.pair_loss = []
