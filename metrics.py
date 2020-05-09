@@ -35,7 +35,7 @@ class Metric:
 
         ys_pred = (ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy() > 0) * 1
         ys_true = ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy()
-        print(ys_pred.shape, ys_true.shape)
+
         if not self.concat:
             self.true_segm = ys_true
             self.pred_segm = ys_pred
@@ -68,8 +68,6 @@ class Metric:
         rec  = sum(rec_l) / len(rec_l)
         f1   = sum(f1_l)  / len(f1_l)
 
-        print(np.unique(self.true_segm), np.unique(self.pred_segm)
-              , self.true_segm.shape, self.pred_segm.shape)
         jac = jaccard(self.true_segm, self.pred_segm)
 
         loss = sum(self.loss) / len(self.loss)
