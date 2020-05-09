@@ -147,8 +147,7 @@ class SResYNet(nn.Module):
         self.up3 = base_model.up3
         self.up4 = base_model.up4
         self.up5 = base_model.up5
-        self.conv_segm = nn.Sequential(*[ConvBlock(64, 16, kernel_size=1),
-                                         nn.Conv2d(16, n_class, 1)])
+        self.conv_segm = base_model.conv_segm
 
     def forward(self, x):
         x1 = self.down1(x)   # -> 112x112x64
@@ -170,6 +169,7 @@ class SResYNet(nn.Module):
         x = self.clsf(z1)
 
         return x, z
+
 
 class Unet(nn.Module):
 
@@ -198,12 +198,13 @@ class Unet(nn.Module):
                                up_conv_in_channels=256, up_conv_out_channels=128)
         self.up5 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
                                up_conv_in_channels=128, up_conv_out_channels=64)
-        self.conv_segm = nn.Sequential(*[ConvBlock(64, 16, kernel_size=1),
+        self.conv_segm = nn.Sequential(*[ConvBlock(64, 16, kernel_size=1, padding=0),
                                          nn.Conv2d(16, n_class, 1)])
 
     def forward(self, x):
 
         x1 = self.down1(x)  # -> 112x112x64
+
         x2 = self.down2(x1)  # -> 56x56x64
         x3 = self.down3(x2)  # -> 56x56x256
         x4 = self.down4(x3)  # -> 28x28x512
@@ -218,7 +219,7 @@ class Unet(nn.Module):
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))  # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
-
+        print(z.shape)
         return z
 
 

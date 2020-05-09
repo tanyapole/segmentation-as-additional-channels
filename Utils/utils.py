@@ -56,12 +56,13 @@ def print_save_results(args, results: pd.DataFrame, time: str, postfix: str):
 
 
 def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: str) -> pd.DataFrame:
-    print('''Epoch: {} Loss: {:.6f} bce1_loss {:.6f} train_type {} F1: {:.4f} F1_labeled {} 
+    print('''Epoch: {} Loss: {:.6f} bce1_loss {:.6f} train_type {} F1: {:.4f} F1_segm: {:.4f} F1_labeled {} 
              Time: {:.4f}'''.format(metrics['epoch'],
                                     metrics['loss'],
                                     metrics['bce1_loss'],
                                     train_type,
                                     metrics['f1_score'],
+                                    metrics['f1_score_segm'],
                                     metrics['f1_score_labels'],
                                     metrics['epoch_time']))
 
@@ -80,6 +81,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: st
                               'recall': metrics['recall'],
                               'recall_labels': metrics['recall_labels'],
                               'f1': metrics['f1_score'],
+                              'f1_segm': metrics['f1_score_segm'],
                               'f1_labels': metrics['f1_score_labels']}, ignore_index=True)
 
     return results

@@ -6,7 +6,7 @@ from torch.utils.data import Dataset, DataLoader
 from albumentations import Compose, RandomRotate90, Flip, Transpose, ShiftScaleRotate
 
 from Utils.utils import npy_to_float_tensor, channels_first, _augment_duo, _augment_one
-from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH, YNET
+from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH, YNET, PRETRAIN
 
 
 class MyDataset(Dataset):
@@ -45,7 +45,7 @@ class MyDataset(Dataset):
 
         labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
 
-        if self.train_type == YNET:
+        if self.train_type in [YNET, PRETRAIN]:
             mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))[:, :, self.indexes]
             image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)

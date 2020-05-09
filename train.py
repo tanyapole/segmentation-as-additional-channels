@@ -58,27 +58,23 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
 
                 image_batch = image_batch.to(device)
                 labels_batch = labels_batch.to(device)
-
+                masks_batch = masks_batch.to(device)
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
 
                 optimizer.zero_grad()
                 if train_type == YNET:
-                    masks_batch = masks_batch.to(device)
                     clsf_output, segm_output = model(image_batch)
-                    """segm = (segm_output.data.cpu().numpy() > 0) * 1
-                    for i in range(2):
-                        s = segm[:,i,:,:].ravel()
-                        print(np.unique(s), s[s==1].shape, s[s==0].shape)"""
-                    loss2 = criterion2(segm_output, masks_batch)
+                    loss2 = criterion2(clsf_output, labels_batch)
                 else:
-                    clsf_output = model(image_batch)
+                    segm_output = model(image_batch)
+                    clsf_output = labels_batch.clone().detach()
                     loss2 = torch.zeros(1).to(device)
-                loss1 = criterion(clsf_output, labels_batch)
+                loss1 = criterion(segm_output, masks_batch)
                 loss = loss1 + loss2
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, clsf_output, loss, loss1, loss2)
+                metrics.train.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             train_f1 = computed_metr['f1_score']
