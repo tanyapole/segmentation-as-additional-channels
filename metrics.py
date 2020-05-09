@@ -26,8 +26,8 @@ class Metric:
         else:
             self.conf_matrix += multilabel_confusion_matrix(yl_true, yl_pred)
 
-        ys_true = (ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy() > 0) * 1
-        ys_pred = ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy()
+        ys_pred = (ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy() > 0) * 1
+        ys_true = ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy()
         print(ys_pred.shape, ys_true.shape)
         if not self.concat:
             self.true_segm = ys_true
@@ -63,7 +63,7 @@ class Metric:
 
         print(np.unique(self.true_segm), np.unique(self.pred_segm)
               , self.true_segm.shape, self.pred_segm.shape)
-        jac = jaccard_score(self.true_segm, self.pred_segm, average='macro')
+        jac = jaccard_score(self.true_segm, self.pred_segm)
 
         loss = sum(self.loss) / len(self.loss)
         bce1_loss = sum(self.bce1_loss) / len(self.bce1_loss)
