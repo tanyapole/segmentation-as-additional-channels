@@ -91,14 +91,13 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     masks_batch = masks_batch.to(device)
                     if train_type == YNET:
                         clsf_output, segm_output = model(image_batch)
-                        loss2 = criterion(clsf_output, labels_batch)
+                        loss2 = criterion(segm_output, masks_batch)
                     else:
-                        segm_output = model(image_batch)
-                        clsf_output = labels_batch.clone().detach()
+                        clsf_output = model(image_batch)
+                        segm_output = None
+                        # clsf_output = labels_batch.clone().detach()
                         loss2 = torch.zeros(1).to(device)
-                    if isinstance(args.attribute, str):
-                        labels_batch = torch.reshape(labels_batch, (-1, 1))
-                    loss1 = criterion(segm_output, masks_batch)
+                    loss1 = criterion(clsf_output, labels_batch)
                     loss = loss1 + loss2
                     metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2, train_type)
             epoch_time = time.time() - start_time
