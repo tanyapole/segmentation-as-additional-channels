@@ -1,5 +1,6 @@
 from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import numpy as np
+from Utils.constants import YNET
 
 
 def jaccard(y_true, y_pred):
@@ -21,7 +22,7 @@ class Metric:
         self.bce1_loss = []
         self.bce2_loss = []
 
-    def update(self, yl_true, yl_pred, ys_true, ys_pred, loss, bce1_loss, bce2_loss):
+    def update(self, yl_true, yl_pred, ys_true, ys_pred, loss, bce1_loss, bce2_loss, train_type: str):
 
         yl_pred = (yl_pred.data.cpu().numpy() > 0) * 1
         yl_true = yl_true.data.cpu().numpy()
@@ -33,16 +34,21 @@ class Metric:
         else:
             self.conf_matrix += multilabel_confusion_matrix(yl_true, yl_pred)
 
-        ys_pred = (ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy() > 0) * 1
-        ys_true = ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy()
+        if train_type == YNET:
+            ys_pred = (ys_pred.view(ys_pred.shape[0]*ys_pred.shape[1], -1).data.cpu().numpy() > 0) * 1
+            ys_true = ys_true.view(ys_true.shape[0]*ys_true.shape[1], -1).data.cpu().numpy()
 
-        if not self.concat:
-            self.true_segm = ys_true
-            self.pred_segm = ys_pred
-            self.concat = True
+            if not self.concat:
+                self.true_segm = ys_true
+                self.pred_segm = ys_pred
+                self.concat = True
+            else:
+                self.true_segm = np.concatenate([self.true_segm, ys_true], axis=0)
+                self.pred_segm = np.concatenate([self.pred_segm, ys_pred], axis=0)
         else:
-            self.true_segm = np.concatenate([self.true_segm, ys_true], axis=0)
-            self.pred_segm = np.concatenate([self.pred_segm, ys_pred], axis=0)
+            self.true_segm = np.array([0])
+            self.pred_segm = np.array([0])
+
         #print(self.conf_matrix)
         self.loss.append(loss)
         self.bce1_loss.append(bce1_loss)
