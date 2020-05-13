@@ -52,7 +52,7 @@ if __name__ == "__main__":
         results2 = train(args, results2, SEED=SEED, train_type=YNET, epochs=K2)
         print_save_results(args, results2, time, YNET)
 
-        """print('_' * 40)
+        print('_' * 40)
         print('train resnet50 on {} for {} epoch to compare'.format(TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, K1+K2))
         results3 = train(args, results3, SEED=SEED, train_type=BASELINE, epochs=K1+K2)
-        print_save_results(args, results3, time, BASELINE)"""
+        print_save_results(args, results3, time, BASELINE)

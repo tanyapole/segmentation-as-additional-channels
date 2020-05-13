@@ -68,14 +68,12 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     loss2 = criterion(segm_output, masks_batch)
                 else:
                     clsf_output = model(image_batch)
-                    segm_output = None
-                    # clsf_output = labels_batch.clone().detach()
                     loss2 = torch.zeros(1).to(device)
                 loss1 = criterion(clsf_output, labels_batch)
                 loss = loss1 + loss2
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2, train_type)
+                metrics.train.update(labels_batch, clsf_output, loss, loss1, loss2)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             train_f1 = computed_metr['f1_score']
@@ -94,12 +92,10 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                         loss2 = criterion(segm_output, masks_batch)
                     else:
                         clsf_output = model(image_batch)
-                        segm_output = None
-                        # clsf_output = labels_batch.clone().detach()
                         loss2 = torch.zeros(1).to(device)
                     loss1 = criterion(clsf_output, labels_batch)
                     loss = loss1 + loss2
-                    metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2, train_type)
+                    metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2,)
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
             temp_f1 = computed_metr['f1_score']
