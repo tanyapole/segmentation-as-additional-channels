@@ -41,18 +41,18 @@ if __name__ == "__main__":
         SEED = SEED_LIST[experiment]
         args.N = experiment
         print(args)
-
-        print('_' * 40)
+        
+        """print('_' * 40)
         print('pretrain resnet50 on {} for {} epoch'.format(TRAIN_TRAIN_NUMBER, K1))
         results1 = train(args, results1, SEED=SEED, train_type=PRETRAIN, epochs=K1)
-        print_save_results(args, results1, time, PRETRAIN)
+        print_save_results(args, results1, time, PRETRAIN)"""
 
         print('_' * 40)
         print('train y_net on {} for {} epoch'.format(TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, K2))
         results2 = train(args, results2, SEED=SEED, train_type=YNET, epochs=K2)
         print_save_results(args, results2, time, YNET)
 
-        print('_' * 40)
+        """print('_' * 40)
         print('train resnet50 on {} for {} epoch to compare'.format(TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, K1+K2))
         results3 = train(args, results3, SEED=SEED, train_type=BASELINE, epochs=K1+K2)
-        print_save_results(args, results3, time, BASELINE)
+        print_save_results(args, results3, time, BASELINE)"""

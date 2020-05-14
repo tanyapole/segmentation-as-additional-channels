@@ -62,7 +62,7 @@ class ResYNet(nn.Module):
         self.down5 = base_model.layer3
         self.down6 = base_model.layer4
 
-        self.clsf = nn.Sequential(*[ConvBlock(2048, 256, kernel_size=1, padding=0),
+        self.clsf = nn.Sequential(*[ConvBlock(512, 256, kernel_size=1, padding=0),
                                     base_model.avgpool,
                                     nn.Flatten(),
                                     nn.Linear(256, 256, bias=False),
@@ -104,7 +104,7 @@ class ResYNet(nn.Module):
         z = self.up5((z, x))   # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
 
-        x = self.clsf(x6)   # classification
+        x = self.clsf(x4)   # classification
 
         return x, z
 
