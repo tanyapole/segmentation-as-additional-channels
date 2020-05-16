@@ -217,9 +217,10 @@ class Unet(nn.Module):
 
 
 def create_model(args, train_type):
-
     if train_type == YNET:
-        model = ResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
+        model = SResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
+    elif train_type == PRETRAIN:
+        model = Unet(args.pretrained, len(args.attribute))
     else:
         model = models.resnet50(pretrained=args.pretrained)
         model.fc = nn.Linear(2048, len(args.attribute))
