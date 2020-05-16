@@ -76,9 +76,10 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 loss = loss1 + loss2
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2)
+                metrics.train.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
+                                     train_type)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.train.compute(ep, epoch_time)
+            computed_metr = metrics.train.compute(ep, epoch_time, train_type)
             train_f1 = computed_metr['f1_score']
             results = print_update(computed_metr, results, args, 'train', train_type)
             metrics.train.reset()
@@ -101,9 +102,10 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     # loss1 = criterion(clsf_output, labels_batch)
                     loss1 = criterion(segm_output, masks_batch)
                     loss = loss1 + loss2
-                    metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2)
+                    metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
+                                         train_type)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.valid.compute(ep, epoch_time)
+            computed_metr = metrics.valid.compute(ep, epoch_time, train_type)
             temp_jac = computed_metr['jaccard']
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
