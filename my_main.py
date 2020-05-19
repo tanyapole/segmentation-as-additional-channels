@@ -37,7 +37,7 @@ if __name__ == "__main__":
     time = datetime.datetime.now().strftime('%d_%H.%M')
     i = 0
 
-    for experiment in range(1, N):
+    for experiment in range(0, N):
         SEED = SEED_LIST[experiment]
         args.N = experiment
         print(args)
