@@ -117,11 +117,11 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_jac = temp_jac
-            if train_type == YNET:
+            """if train_type == YNET:
                 if train_f1 > best_train_f1:
                     name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
-                    best_train_f1 = train_f1
+                    best_train_f1 = train_f1"""
         except KeyboardInterrupt:
             return
     # writer.close()
