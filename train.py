@@ -28,7 +28,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
 
     model = create_model(args, train_type)
 
-    optimizer = Adam(model.parameters(), lr=args.lr)
+    optimizer = Adam(filter(lambda p: p.requires_grad, model.parameters(), lr=args.lr))
 
     if args.show_model:
         print(model)
