@@ -118,8 +118,8 @@ class SResYNet(nn.Module):
 
         checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
         base_model.load_state_dict(checkpoint['model'])
-        for param in base_model.parameters():
-            param.requires_grad = False
+        """for param in base_model.parameters():
+            param.requires_grad = False"""
 
         self.down1 = base_model.down1
         self.down2 = base_model.down2
