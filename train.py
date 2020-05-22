@@ -101,8 +101,8 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                         clsf_output = labels_batch.clone().detach()
                         loss2 = torch.zeros(1).to(device)
                     # loss1 = criterion(clsf_output, labels_batch)
-                    loss1 = criterion(segm_output, masks_batch)
-                    # loss1 = torch.zeros(1).to(device)
+                    # loss1 = criterion(segm_output, masks_batch)
+                    loss1 = torch.zeros(1).to(device)
                     loss = loss1 + loss2
                     metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
                                          train_type)
