@@ -157,12 +157,12 @@ class SResYNet(nn.Module):
 
         z = self.up1((b, x5))  # -> 14x14x1024
         z = self.up2((z, x4))  # -> 28x28x512
-        # z = self.up3((z, x3))  # -> 56x56x256
-        # z = self.up4((z, x1))  # -> 112x112x128
-        # z = self.up5((z, x))   # -> 224x224x64
-        # z = self.conv_segm(z)  # -> 224x224xn
+        z = self.up3((z, x3))  # -> 56x56x256
+        z = self.up4((z, x1))  # -> 112x112x128
+        z = self.up5((z, x))   # -> 224x224x64
+        z = self.conv_segm(z)  # -> 224x224xn
 
-        x = self.clsf(z)
+        x = self.clsf(x4)
 
         return x, z
 
