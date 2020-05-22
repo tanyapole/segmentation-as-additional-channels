@@ -7,7 +7,7 @@ IMAGE_PATH = 'images_npy'
 MASK_PATH = 'masks_npy'
 
 K1 = 100
-K2 = 100
+K2 = 130
 
 TRAIN_TRAIN_NUMBER = 1600
 TRAIN_VALID_NUMBER = 400
