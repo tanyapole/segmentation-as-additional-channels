@@ -116,8 +116,8 @@ class SResYNet(nn.Module):
 
         base_model = Unet(pretrained, n_class)
 
-        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-        base_model.load_state_dict(checkpoint['model'])
+        """checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])"""
         """for param in base_model.parameters():
             param.requires_grad = False"""
 
