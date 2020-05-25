@@ -42,7 +42,6 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
     best_jac = 0
-    best_train_f1 = 0
     for ep in range(epochs):
         try:
             start_time = time.time()
@@ -70,8 +69,8 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     clsf_output = labels_batch.clone().detach()
                     loss2 = torch.zeros(1).to(device)
                 # loss1 = criterion(clsf_output, labels_batch)
-                # loss1 = criterion(segm_output, masks_batch)
-                loss1 = torch.zeros(1).to(device)
+                loss1 = criterion(segm_output, masks_batch)
+                # loss1 = torch.zeros(1).to(device)
                 loss = loss1 + loss2
                 loss.backward()
                 optimizer.step()
@@ -115,7 +114,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_jac = temp_jac
-            if train_type == YNET:
+            if train_type == YNET and ep == epochs - 1:
                 name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, ep, optimizer)
         except KeyboardInterrupt:
