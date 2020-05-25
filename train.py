@@ -6,7 +6,6 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 from torch.backends import cudnn
-from tensorboardX import SummaryWriter
 from torch.optim import Adam
 
 from metrics import Metrics
@@ -39,7 +38,6 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
 
     criterion = torch.nn.BCEWithLogitsLoss()
 
-    # writer = SummaryWriter()
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
@@ -101,8 +99,8 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                         clsf_output = labels_batch.clone().detach()
                         loss2 = torch.zeros(1).to(device)
                     # loss1 = criterion(clsf_output, labels_batch)
-                    # loss1 = criterion(segm_output, masks_batch)
-                    loss1 = torch.zeros(1).to(device)
+                    loss1 = criterion(segm_output, masks_batch)
+                    # loss1 = torch.zeros(1).to(device)
                     loss = loss1 + loss2
                     metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
                                          train_type)
@@ -117,12 +115,9 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_jac = temp_jac
-            """if train_type == YNET:
-                if train_f1 > best_train_f1:
-                    name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
-                    save_weights(model, name, ep, optimizer)
-                    best_train_f1 = train_f1"""
+            if train_type == YNET:
+                name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
+                save_weights(model, name, ep, optimizer)
         except KeyboardInterrupt:
             return
-    # writer.close()
     return results
