@@ -56,33 +56,20 @@ def print_save_results(args, results: pd.DataFrame, time: str, postfix: str):
 
 
 def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: str) -> pd.DataFrame:
-    print('''Epoch: {} Loss: {:.6f} bce1_loss {:.6f} train_type {} F1: {:.4f} Jaccard: {:.4f} F1_labeled {} 
-             Time: {:.4f}'''.format(metrics['epoch'],
-                                    metrics['loss'],
-                                    metrics['bce1_loss'],
-                                    train_type,
-                                    metrics['f1_score'],
-                                    metrics['jaccard'],
-                                    metrics['f1_score_labels'],
-                                    metrics['epoch_time']))
+    print('''Epoch: {} Loss: {:.6f} train_type {} acc: {:.4f} Time: {:.4f}'''.format(metrics['epoch'],
+                                                                                     metrics['loss'],
+                                                                                     train_type,
+                                                                                     metrics['acc'],
+                                                                                     metrics['epoch_time']))
 
     results = results.append({'train_type': train_type,
                               'lr': args.lr,
-                              'bce1_loss': metrics['bce1_loss'],
-                              'bce2_loss': metrics['bce2_loss'],
                               'exp': args.N,
                               'train_mode': mode,
                               'epoch': metrics['epoch'],
                               'loss': metrics['loss'],
                               'acc': metrics['accuracy'],
-                              'acc_labels': metrics['accuracy_labels'],
-                              'prec': metrics['precision'],
-                              'prec_labels': metrics['precision_labels'],
-                              'recall': metrics['recall'],
-                              'recall_labels': metrics['recall_labels'],
-                              'f1': metrics['f1_score'],
-                              'jaccard': metrics['jaccard'],
-                              'f1_labels': metrics['f1_score_labels']}, ignore_index=True)
+                              'acc_labels': metrics['accuracy_labels']}, ignore_index=True)
 
     return results
 

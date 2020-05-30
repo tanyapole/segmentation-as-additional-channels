@@ -7,13 +7,14 @@ import os
 from torch.optim import Adam
 import pandas as pd
 import torch
+from resnest.torch import resnest101
 
 from models import create_model
 from my_dataset import make_loader
 from metrics import Metrics
 
 device='cuda'
-class Args:
+"""class Args:
     def __init__(self):
         self.attribute = ['attribute_globules', 'attribute_milia_like_cyst']
         self.pretrained = False
@@ -47,8 +48,49 @@ with torch.no_grad():
         loss = loss1 = loss2 = torch.zeros(1).to(device)
         metrics.valid.update(labels_batch, clsf_output, loss, loss1, loss2)
     print(metrics.valid.compute(ep=0, epoch_time=0.1))
-del model
+del model"""
 
+class own_model(nn.Module):
+    def __init__(self, pretrained: bool, n_class: int, model_path : str='', N: int=0):
+        super().__init__()
+
+        base_model = resnest101(pretrained=True)
+
+        self.down1 = nn.Sequential(*[base_model.conv1,
+                                     base_model.bn1,
+                                     base_model.relu])
+        self.down2 = base_model.maxpool
+        self.down3 = base_model.layer1
+        self.down4 = base_model.layer2
+        self.down5 = base_model.layer3
+        self.down6 = base_model.layer4
+        self.clsf = nn.Sequential(*[base_model.avgpool,
+                                    nn.Flatten(),
+                                    base_model.fc])
+
+    def forward(self, x):
+        print(x.shape)
+        x = self.down1(x)
+        print(x.shape)
+        x = self.down2(x)
+        print(x.shape)
+        x = self.down3(x)
+        print(x.shape)
+        x = self.down4(x)
+        print(x.shape)
+        x = self.down5(x)
+        print(x.shape)
+        x = self.down6(x)
+        print(x.shape)
+        x = self.clsf(x)
+        print(x.shape)
+        return x
+
+model = own_model(True, 2)
+img = np.zeros([2,3,224,224])
+img_tensor = torch.from_numpy(img).float()
+x = model(img_tensor)
+del model
 """path = 'D:/Data/albums/images_npy/'
 name = os.listdir(path)[0]
 img = np.load(path + name)

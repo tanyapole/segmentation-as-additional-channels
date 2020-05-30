@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torchvision import models
+from resnest.torch import resnest101
 
 from Utils.constants import YNET, PRETRAIN
 
@@ -47,7 +48,7 @@ class ResYNet(nn.Module):
     def __init__(self, pretrained: bool, n_class: int, model_path : str='', N: int=0):
         super().__init__()
 
-        base_model = models.resnet50(pretrained=pretrained)
+        base_model = resnest101(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
 
         checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
@@ -221,10 +222,10 @@ class Unet(nn.Module):
 
 def create_model(args, train_type):
     if train_type == YNET:
-        model = SResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
+        model = ResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
     elif train_type == PRETRAIN:
         model = Unet(args.pretrained, len(args.attribute))
     else:
-        model = models.resnet50(pretrained=args.pretrained)
+        model = resnest101(pretrained=args.pretrained)
         model.fc = nn.Linear(2048, len(args.attribute))
     return model

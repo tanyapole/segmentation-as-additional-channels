@@ -36,12 +36,12 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
         model = nn.DataParallel(model)
     model.to(device)
 
-    criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = torch.nn.CrossEntropyLoss()
 
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
-    best_jac = 0
+
     for ep in range(epochs):
         try:
             start_time = time.time()
@@ -64,21 +64,17 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     clsf_output, segm_output = model(image_batch)
                     loss2 = criterion(clsf_output, labels_batch)
                 else:
-                    # clsf_output = model(image_batch)
-                    segm_output = model(image_batch)
-                    clsf_output = labels_batch.clone().detach()
-                    loss2 = torch.zeros(1).to(device)
+                    clsf_output = model(image_batch)
+                    # segm_output = model(image_batch)
+                    # clsf_output = labels_batch.clone().detach()
                 # loss1 = criterion(clsf_output, labels_batch)
-                loss1 = criterion(segm_output, masks_batch)
+                loss = criterion(clsf_output, labels_batch)
                 # loss1 = torch.zeros(1).to(device)
-                loss = loss1 + loss2
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
-                                     train_type)
+                metrics.train.update(labels_batch, clsf_output, loss)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.train.compute(ep, epoch_time, train_type)
-            train_f1 = computed_metr['f1_score']
+            computed_metr = metrics.train.compute(ep, epoch_time)
             results = print_update(computed_metr, results, args, 'train', train_type)
             metrics.train.reset()
 
@@ -94,29 +90,27 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                         loss2 = criterion(clsf_output, labels_batch)
                     else:
                         # clsf_output = model(image_batch)
-                        segm_output = model(image_batch)
-                        clsf_output = labels_batch.clone().detach()
-                        loss2 = torch.zeros(1).to(device)
+                        clsf_output = model(image_batch)
                     # loss1 = criterion(clsf_output, labels_batch)
-                    loss1 = criterion(segm_output, masks_batch)
+                    loss = criterion(clsf_output, labels_batch)
                     # loss1 = torch.zeros(1).to(device)
-                    loss = loss1 + loss2
-                    metrics.valid.update(labels_batch, clsf_output, masks_batch, segm_output, loss, loss1, loss2,
-                                         train_type)
+                    metrics.valid.update(labels_batch, clsf_output, loss)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.valid.compute(ep, epoch_time, train_type)
-            temp_jac = computed_metr['jaccard']
+            computed_metr = metrics.valid.compute(ep, epoch_time)
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
 
-            if train_type == PRETRAIN:
+            if ep == epochs -1:
+                name = '{}model_base_{}.pt'.format(args.model_path, args.N)
+                save_weights(model, name, ep, optimizer)
+            """if train_type == PRETRAIN:
                 if temp_jac > best_jac:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_jac = temp_jac
             if train_type == YNET and ep == epochs - 1:
                 name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
-                save_weights(model, name, ep, optimizer)
+                save_weights(model, name, ep, optimizer)"""
         except KeyboardInterrupt:
             return
     return results
