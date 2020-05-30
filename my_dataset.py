@@ -17,10 +17,8 @@ class MyDataset(Dataset):
         self.train_type = train_type
         self.image_path = args.image_path
         self.pretrained = args.pretrained
-        self.attribute = args.attribute
         self.train = train
         self.normalize = args.normalize
-        self.indexes = np.isin(ALL_ATTRIBUTES, self.attribute)
         self.transforms = Compose([RandomRotate90(), Flip(), Transpose(), ShiftScaleRotate()])
 
         self.n = self.train_test_id.shape[0]
@@ -34,7 +32,7 @@ class MyDataset(Dataset):
         name = self.train_test_id.iloc[index].ID
         path = self.image_path
 
-        image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name[5:]))
+        image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name))
         image = (image / 255.0)
 
         if self.pretrained:
@@ -43,10 +41,10 @@ class MyDataset(Dataset):
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
 
-        labels = np.array([self.train_test_id.loc[index, attr[10:]] for attr in self.attribute])
+        labels = np.array([self.train_test_id.loc[index, attr] for attr in ALL_ATTRIBUTES])
 
-        if self.train_type  in [YNET, PRETRAIN]:
-            mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name[5:]))[:, :, self.indexes]
+        if self.train_type in [YNET, PRETRAIN]:
+            mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name))
             image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)
             image = channels_first(image)

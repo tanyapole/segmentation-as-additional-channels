@@ -3,7 +3,7 @@ from torch import nn
 from torchvision import models
 from resnest.torch import resnest101
 
-from Utils.constants import YNET, PRETRAIN
+from Utils.constants import YNET, PRETRAIN, ALL_ATTRIBUTES
 
 
 class ConvBlock(nn.Module):
@@ -222,10 +222,10 @@ class Unet(nn.Module):
 
 def create_model(args, train_type):
     if train_type == YNET:
-        model = ResYNet(args.pretrained, len(args.attribute), args.model_path, args.N)
+        model = ResYNet(args.pretrained, len(ALL_ATTRIBUTES), args.model_path, args.N)
     elif train_type == PRETRAIN:
-        model = Unet(args.pretrained, len(args.attribute))
+        model = Unet(args.pretrained, len(ALL_ATTRIBUTES))
     else:
-        model = resnest101(pretrained=args.pretrained)
-        model.fc = nn.Linear(2048, len(args.attribute))
+        model = resnest101(pretrained=ALL_ATTRIBUTES)
+        model.fc = nn.Linear(2048, len(ALL_ATTRIBUTES))
     return model
