@@ -29,7 +29,7 @@ class MyDataset(Dataset):
 
     def __getitem__(self, index: int):
 
-        name = self.train_test_id.iloc[index].ID
+        name = self.train_test_id.iloc[index].filename
         path = self.image_path
 
         image = np.load(os.path.join(path, IMAGE_PATH, '%s.npy' % name))
