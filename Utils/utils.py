@@ -76,7 +76,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: st
 
 def channels_first(arr:np.array, channel:int=0) -> np.array: return np.moveaxis(arr, -1, channel)
 def npy_to_float_tensor(arr:np.array) -> torch.Tensor: return torch.tensor(arr, dtype=torch.float32)
-
+def npy_to_int_tensor(arr:np.array) -> torch.Tensor: return  torch.tensor(arr, dtype=torch.int32)
 
 def save_weights(model, model_path, epoch, optimizer):
     torch.save({'model': model.module.state_dict(),

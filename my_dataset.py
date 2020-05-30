@@ -5,7 +5,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from albumentations import Compose, RandomRotate90, Flip, Transpose, ShiftScaleRotate
 
-from Utils.utils import npy_to_float_tensor, channels_first, _augment_duo, _augment_one
+from Utils.utils import npy_to_float_tensor, npy_to_int_tensor, channels_first, _augment_duo, _augment_one
 from Utils.constants import ALL_ATTRIBUTES, IMAGE_PATH, MASK_PATH, YNET, PRETRAIN
 
 
@@ -52,7 +52,7 @@ class MyDataset(Dataset):
         else:
             image = _augment_one(self.transforms, image)
             image = channels_first(image)
-            return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
+            return npy_to_float_tensor(image), np.zeros(1), npy_to_int_tensor(labels), name
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train_type: str,
