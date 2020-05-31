@@ -59,7 +59,7 @@ def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: st
     print('''Epoch: {} Loss: {:.6f} train_type {} acc: {:.4f} Time: {:.4f}'''.format(metrics['epoch'],
                                                                                      metrics['loss'],
                                                                                      train_type,
-                                                                                     metrics['acc'],
+                                                                                     metrics['accuracy'],
                                                                                      metrics['epoch_time']))
 
     results = results.append({'train_type': train_type,
