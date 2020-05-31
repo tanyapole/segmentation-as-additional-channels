@@ -54,7 +54,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
                 image_batch = image_batch.to(device)
-                labels_batch = labels_batch.to(device)
+                labels_batch = labels_batch.to(device).squeeze()
                 masks_batch = masks_batch.to(device)
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
