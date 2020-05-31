@@ -52,7 +52,7 @@ class MyDataset(Dataset):
         else:
             image = _augment_one(self.transforms, image)
             image = channels_first(image)
-            return npy_to_float_tensor(image), np.zeros(1), npy_to_int_tensor(labels), name
+            return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train_type: str,
