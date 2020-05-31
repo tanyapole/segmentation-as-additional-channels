@@ -83,7 +83,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
             with torch.no_grad():
                 for i, (image_batch, masks_batch, labels_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
-                    labels_batch = labels_batch.to(device)
+                    labels_batch = labels_batch.to(device).squeeze()
                     masks_batch = masks_batch.to(device)
                     if train_type == YNET:
                         clsf_output, segm_output = model(image_batch)
