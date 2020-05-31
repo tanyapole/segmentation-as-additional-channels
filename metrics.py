@@ -6,7 +6,7 @@ class Metric:
 
     def __init__(self, args):
 
-        self.conf_matrix = np.zeros([ALL_ATTRIBUTES, 2, 2])
+        self.conf_matrix = np.zeros([len(ALL_ATTRIBUTES), 2, 2])
         self.loss = []
 
     def update(self, yl_true, yl_pred, loss):
