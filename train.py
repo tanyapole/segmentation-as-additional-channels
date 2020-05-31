@@ -36,7 +36,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
         model = nn.DataParallel(model)
     model.to(device)
 
-    criterion = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.BCEWithLogitsLoss()
 
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
@@ -54,7 +54,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
                 image_batch = image_batch.to(device)
-                labels_batch = labels_batch.to(device).squeeze()
+                labels_batch = labels_batch.to(device)
                 masks_batch = masks_batch.to(device)
                 if isinstance(args.attribute, str):
                     labels_batch = torch.reshape(labels_batch, (-1, 1))
@@ -83,7 +83,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
             with torch.no_grad():
                 for i, (image_batch, masks_batch, labels_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
-                    labels_batch = labels_batch.to(device).squeeze()
+                    labels_batch = labels_batch.to(device)
                     masks_batch = masks_batch.to(device)
                     if train_type == YNET:
                         clsf_output, segm_output = model(image_batch)
