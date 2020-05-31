@@ -1,12 +1,12 @@
 from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import numpy as np
-
+from Utils.constants import ALL_ATTRIBUTES
 
 class Metric:
 
     def __init__(self, args):
 
-        self.conf_matrix = np.zeros([len(args.attribute), 2, 2])
+        self.conf_matrix = np.zeros([ALL_ATTRIBUTES, 2, 2])
         self.loss = []
 
     def update(self, yl_true, yl_pred, loss):
