@@ -117,8 +117,8 @@ class SResYNet(nn.Module):
 
         base_model = Unet(pretrained, n_class)
 
-        """checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
-        base_model.load_state_dict(checkpoint['model'])"""
+        checkpoint = torch.load(model_path + 'model_{}.pt'.format(N))
+        base_model.load_state_dict(checkpoint['model'])
         """for param in base_model.parameters():
             param.requires_grad = False"""
 
@@ -158,14 +158,14 @@ class SResYNet(nn.Module):
 
         z = self.up1((b, x5))  # -> 14x14x1024
         z1 = self.up2((z, x4))  # -> 28x28x512
-        z = self.up3((z1, x3))  # -> 56x56x256
-        z = self.up4((z, x1))  # -> 112x112x128
-        z = self.up5((z, x))   # -> 224x224x64
-        z = self.conv_segm(z)  # -> 224x224xn
+        # z = self.up3((z1, x3))  # -> 56x56x256
+        # z = self.up4((z, x1))  # -> 112x112x128
+        # z = self.up5((z, x))   # -> 224x224x64
+        # z = self.conv_segm(z)  # -> 224x224xn
 
         x = self.clsf(z1)
 
-        return x, z
+        return x
 
 
 class Unet(nn.Module):
@@ -173,7 +173,7 @@ class Unet(nn.Module):
     def __init__(self, pretrained: bool, n_class: int):
         super().__init__()
 
-        base_model = models.resnet50(pretrained=pretrained)
+        base_model = resnest101(pretrained=pretrained)
         base_model.fc = nn.Linear(2048, n_class)
 
         self.down1 = nn.Sequential(*[base_model.conv1,
@@ -222,7 +222,7 @@ class Unet(nn.Module):
 
 def create_model(args, train_type):
     if train_type == YNET:
-        model = ResYNet(args.pretrained, len(ALL_ATTRIBUTES), args.model_path, args.N)
+        model = SResYNet(args.pretrained, len(ALL_ATTRIBUTES), args.model_path, args.N)
     elif train_type == PRETRAIN:
         model = Unet(args.pretrained, len(ALL_ATTRIBUTES))
     else:

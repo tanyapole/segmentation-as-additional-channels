@@ -41,18 +41,17 @@ class MyDataset(Dataset):
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
 
-        labels = np.array([self.train_test_id.loc[index, attr] for attr in ALL_ATTRIBUTES])
-
         if self.train_type in [YNET, PRETRAIN]:
             mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name))
             image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)
             image = channels_first(image)
-            return npy_to_float_tensor(image), npy_to_float_tensor(mask), npy_to_float_tensor(labels), name
+            return npy_to_float_tensor(image), npy_to_float_tensor(mask), name
         else:
+            labels = np.array([self.train_test_id.loc[index, attr] for attr in ALL_ATTRIBUTES])
             image = _augment_one(self.transforms, image)
             image = channels_first(image)
-            return npy_to_float_tensor(image), np.zeros(1), npy_to_float_tensor(labels), name
+            return npy_to_float_tensor(image), npy_to_float_tensor(labels), name
 
 
 def make_loader(train_test_id: pd.DataFrame, args, train_type: str,

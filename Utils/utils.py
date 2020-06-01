@@ -30,17 +30,20 @@ def calculate_mean_square(args, mask_names: np.array):
 
 def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
-    indexes = np.arange(train_test_id.shape[0])
+    segm_dataset = train_test_id.loc[train_test_id.split=='segm']
+    rest_dataset = train_test_id.loc[train_test_id.split!='segm']
+    indexes = np.arange(rest_dataset.shape[0])
     random.seed(SEED)
     random.shuffle(indexes)
-    train_test_id = train_test_id.iloc[indexes].reset_index(drop=True)
+    rest_dataset = rest_dataset.iloc[indexes].reset_index(drop=True)
+    train_test_id = pd.concat([segm_dataset, rest_dataset], ignore_index=True)
     train_test_id.loc[:, 'Split'] = ''
     if train_type == PRETRAIN:
-        train_test_id.loc[:TRAIN_TRAIN_NUMBER, 'Split'] = 'train'
+        train_test_id.loc[:TRAIN_TRAIN_NUMBER-1, 'Split'] = 'train'
         # -1 because in pd.loc start and end of indexing are included
-        train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER + TRAIN_VALID_NUMBER - 1, 'Split'] = 'valid'
+        train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER-1, 'Split'] = 'valid'
     else:
-        train_test_id.loc[:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, 'Split'] = 'train'
+        train_test_id.loc[:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER-1, 'Split'] = 'train'
         train_test_id.loc[TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER:, 'Split'] = 'valid'
     return train_test_id
 
@@ -56,7 +59,7 @@ def print_save_results(args, results: pd.DataFrame, time: str, postfix: str):
 
 
 def print_update(metrics, results: pd.DataFrame, args, mode: str, train_type: str) -> pd.DataFrame:
-    print('''Epoch: {} Loss: {:.6f} train_type {} acc: {:.4f} Time: {:.4f}'''.format(metrics['epoch'],
+    print('''Epoch: {} Loss: {:.6f} train_type {} AP: {:.4f} Time: {:.4f}'''.format(metrics['epoch'],
                                                                                      metrics['loss'],
                                                                                      train_type,
                                                                                      metrics['AP'],

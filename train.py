@@ -41,39 +41,28 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
     trn_dl, val_dl = make_loader(train_test_id, args, train_type=train_type, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train_type=train_type, train='valid', shuffle=False)
     metrics = Metrics(args)
-
+    best_loss = 10**15
     for ep in range(epochs):
         try:
             start_time = time.time()
             model.train()
             n_trn = len(trn_dl)
-            for i, (image_batch, masks_batch, labels_batch, names) in enumerate(trn_dl):
+            for i, (image_batch, target_batch, names) in enumerate(trn_dl):
                 if i == n_trn - 1:
                     print(f'\r', end='')
                 else:
                     print(f'\rBatch {i} / {n_trn} ', end='')
 
                 image_batch = image_batch.to(device)
-                labels_batch = labels_batch.to(device)
-                masks_batch = masks_batch.to(device)
-                if isinstance(args.attribute, str):
-                    labels_batch = torch.reshape(labels_batch, (-1, 1))
+                target_batch = target_batch.to(device)
 
                 optimizer.zero_grad()
-                if train_type == YNET:
-                    clsf_output, segm_output = model(image_batch)
-                    loss2 = criterion(clsf_output, labels_batch)
-                else:
-                    clsf_output = model(image_batch)
-                    # segm_output = model(image_batch)
-                    # clsf_output = labels_batch.clone().detach()
-                # loss1 = criterion(clsf_output, labels_batch)
-                # print(clsf_output.shape, labels_batch.shape)
-                loss = criterion(clsf_output, labels_batch)
-                # loss1 = torch.zeros(1).to(device)
+
+                output = model(image_batch)
+                loss = criterion(output, target_batch)
                 loss.backward()
                 optimizer.step()
-                metrics.train.update(labels_batch, clsf_output, loss)
+                metrics.train.update(output, target_batch, loss=loss, train_type=train_type)
             epoch_time = time.time() - start_time
             computed_metr = metrics.train.compute(ep, epoch_time)
             results = print_update(computed_metr, results, args, 'train', train_type)
@@ -82,36 +71,31 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
             start_time = time.time()
             model.eval()
             with torch.no_grad():
-                for i, (image_batch, masks_batch, labels_batch, names) in enumerate(val_dl):
+                for i, (image_batch, target_batch, names) in enumerate(val_dl):
                     image_batch = image_batch.to(device)
-                    labels_batch = labels_batch.to(device)
-                    masks_batch = masks_batch.to(device)
-                    if train_type == YNET:
-                        clsf_output, segm_output = model(image_batch)
-                        loss2 = criterion(clsf_output, labels_batch)
-                    else:
-                        # clsf_output = model(image_batch)
-                        clsf_output = model(image_batch)
-                    # loss1 = criterion(clsf_output, labels_batch)
-                    loss = criterion(clsf_output, labels_batch)
-                    # loss1 = torch.zeros(1).to(device)
-                    metrics.valid.update(labels_batch, clsf_output, loss)
+                    target_batch = target_batch.to(device)
+
+                    output = model(image_batch)
+                    loss = criterion(output, target_batch)
+
+                    metrics.valid.update(output, target_batch, loss=loss, train_type=train_type)
             epoch_time = time.time() - start_time
             computed_metr = metrics.valid.compute(ep, epoch_time)
+            temp_loss = computed_metr['loss']
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
 
             if ep == epochs -1:
                 name = '{}model_base_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, ep, optimizer)
-            """if train_type == PRETRAIN:
-                if temp_jac > best_jac:
+            if train_type == PRETRAIN:
+                if temp_loss > best_loss:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
-                    best_jac = temp_jac
+                    best_loss = temp_loss
             if train_type == YNET and ep == epochs - 1:
                 name = '{}model_ynet_{}.pt'.format(args.model_path, args.N)
-                save_weights(model, name, ep, optimizer)"""
+                save_weights(model, name, ep, optimizer)
         except KeyboardInterrupt:
             return
     return results
