@@ -6,7 +6,7 @@ import torch
 import pandas as pd
 import numpy as np
 
-from Utils.constants import TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, PRETRAIN, MASK_PATH
+from Utils.constants import TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, RETRAIN_TRAIN_NUMBER, PRETRAIN, MASK_PATH
 from albumentations import DualTransform
 
 
@@ -32,19 +32,24 @@ def read_split_data(SEED: int, train_type: str) -> pd.DataFrame:
     train_test_id = pd.read_csv('Data/train_test_id_with_masks.csv')
     segm_dataset = train_test_id.loc[train_test_id.split=='segm']
     rest_dataset = train_test_id.loc[train_test_id.split!='segm']
-    indexes = np.arange(rest_dataset.shape[0])
+    rest_indexes = np.arange(rest_dataset.shape[0])
+    segm_indexes = np.arange(segm_dataset.shape[0])
     random.seed(SEED)
-    random.shuffle(indexes)
-    rest_dataset = rest_dataset.iloc[indexes].reset_index(drop=True)
-    train_test_id = pd.concat([segm_dataset, rest_dataset], ignore_index=True)
-    train_test_id.loc[:, 'Split'] = ''
+    random.shuffle(rest_indexes)
+    random.seed(SEED)
+    random.shuffle(segm_indexes)
+    rest_dataset = rest_dataset.iloc[rest_indexes].reset_index(drop=True)
+    segm_dataset = segm_dataset.iloc[segm_indexes].reset_index(drop=True)
     if train_type == PRETRAIN:
+        train_test_id = segm_dataset
         train_test_id.loc[:TRAIN_TRAIN_NUMBER-1, 'Split'] = 'train'
         # -1 because in pd.loc start and end of indexing are included
         train_test_id.loc[TRAIN_TRAIN_NUMBER:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER-1, 'Split'] = 'valid'
     else:
-        train_test_id.loc[:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER-1, 'Split'] = 'train'
-        train_test_id.loc[TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER:, 'Split'] = 'valid'
+        train_test_id = pd.concat([segm_dataset, rest_dataset], ignore_index=True)
+        train_test_id.loc[:, 'Split'] = ''
+        train_test_id.loc[:TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER+RETRAIN_TRAIN_NUMBER-1, 'Split'] = 'train'
+        train_test_id.loc[TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER+RETRAIN_TRAIN_NUMBER:, 'Split'] = 'valid'
     return train_test_id
 
 

@@ -1,4 +1,4 @@
-from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix, average_precision_score
+from sklearn.metrics import average_precision_score
 import numpy as np
 from Utils.constants import PRETRAIN
 
