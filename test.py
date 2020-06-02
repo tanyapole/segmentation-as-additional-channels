@@ -69,21 +69,13 @@ class own_model(nn.Module):
                                     base_model.fc])
 
     def forward(self, x):
-        print(x.shape)
-        x = self.down1(x)
-        print(x.shape)
-        x = self.down2(x)
-        print(x.shape)
-        x = self.down3(x)
-        print(x.shape)
-        x = self.down4(x)
-        print(x.shape)
-        x = self.down5(x)
-        print(x.shape)
-        x = self.down6(x)
-        print(x.shape)
+        x = self.down1(x)  # -> 112x112x128
+        x = self.down2(x)  # -> 56x56x128
+        x = self.down3(x)  # -> 56x56x256
+        x = self.down4(x)  # -> 28x28x512
+        x = self.down5(x)  # -> 14x14x1024
+        x = self.down6(x)  # -> 7x7x2048
         x = self.clsf(x)
-        print(x.shape)
         return x
 
 model = own_model(True, 2)

@@ -191,7 +191,7 @@ class Unet(nn.Module):
         self.up1 = UnetUpBlock(2048, 1024)
         self.up2 = UnetUpBlock(1024, 512)
         self.up3 = UnetUpBlock(512, 256)
-        self.up4 = UnetUpBlock(in_channels=128 + 64, out_channels=128,
+        self.up4 = UnetUpBlock(in_channels=128 + 128, out_channels=128,
                                up_conv_in_channels=256, up_conv_out_channels=128)
         self.up5 = UnetUpBlock(in_channels=64 + 3, out_channels=64,
                                up_conv_in_channels=128, up_conv_out_channels=64)
@@ -200,9 +200,9 @@ class Unet(nn.Module):
 
     def forward(self, x):
 
-        x1 = self.down1(x)  # -> 112x112x64
+        x1 = self.down1(x)  # -> 112x112x128
+        x2 = self.down2(x1)  # -> 56x56x128
 
-        x2 = self.down2(x1)  # -> 56x56x64
         x3 = self.down3(x2)  # -> 56x56x256
         x4 = self.down4(x3)  # -> 28x28x512
         x5 = self.down5(x4)  # -> 14x14x1024
@@ -213,6 +213,7 @@ class Unet(nn.Module):
         z = self.up1((b, x5))  # -> 14x14x1024
         z = self.up2((z, x4))  # -> 28x28x512
         z = self.up3((z, x3))  # -> 56x56x256
+
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))  # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
@@ -226,6 +227,6 @@ def create_model(args, train_type):
     elif train_type == PRETRAIN:
         model = Unet(args.pretrained, len(ALL_ATTRIBUTES))
     else:
-        model = resnest101(pretrained=ALL_ATTRIBUTES)
+        model = resnest101(pretrained=args.pretrained)
         model.fc = nn.Linear(2048, len(ALL_ATTRIBUTES))
     return model
