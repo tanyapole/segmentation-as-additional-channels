@@ -64,7 +64,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 optimizer.step()
                 metrics.train.update(output, target_batch, loss=loss, train_type=train_type)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.train.compute(ep, epoch_time)
+            computed_metr = metrics.train.compute(ep, epoch_time, train_type=train_type)
             results = print_update(computed_metr, results, args, 'train', train_type)
             metrics.train.reset()
 
@@ -80,7 +80,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
 
                     metrics.valid.update(output, target_batch, loss=loss, train_type=train_type)
             epoch_time = time.time() - start_time
-            computed_metr = metrics.valid.compute(ep, epoch_time)
+            computed_metr = metrics.valid.compute(ep, epoch_time, train_type=train_type)
             temp_loss = computed_metr['loss']
             results = print_update(computed_metr, results, args, 'valid', train_type)
             metrics.valid.reset()
