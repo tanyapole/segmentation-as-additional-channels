@@ -41,7 +41,7 @@ class MyDataset(Dataset):
                 std = np.array([0.229, 0.224, 0.225])
                 image = (image - mean) / std
 
-        if self.train_type in [YNET, PRETRAIN]:
+        if self.train_type in [PRETRAIN]:
             mask = np.load(os.path.join(path, MASK_PATH, '%s.npy' % name))
             image, mask = _augment_duo(self.transforms, image, mask)
             mask = channels_first(mask)
