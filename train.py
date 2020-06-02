@@ -89,7 +89,7 @@ def train(args, results: pd.DataFrame, SEED: int, train_type: str, epochs: int) 
                 name = '{}model_base_{}.pt'.format(args.model_path, args.N)
                 save_weights(model, name, ep, optimizer)
             if train_type == PRETRAIN:
-                if temp_loss > best_loss:
+                if temp_loss < best_loss:
                     name = '{}model_{}.pt'.format(args.model_path, args.N)
                     save_weights(model, name, ep, optimizer)
                     best_loss = temp_loss
