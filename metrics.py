@@ -18,7 +18,7 @@ class Metric:
         self.y_pred_all = np.array([])
         self.loss = []
 
-    def update(self, yl_true, yl_pred, loss, train_type: str):
+    def update(self, yl_pred, yl_true, loss, train_type: str):
 
         if train_type != PRETRAIN:
             self.y_pred_all = np.append(self.y_pred_all, yl_pred.data.cpu().numpy())
@@ -30,6 +30,7 @@ class Metric:
     def compute(self, ep: int, epoch_time: float, train_type: str) -> dict:
 
         if train_type != PRETRAIN:
+            print(self.y_true_all.shape, self.y_pred_all.shape)
             metric = average_precision_score(y_true=self.y_true_all, y_score=self.y_pred_all, average='micro')
         else:
             metric = 0.
