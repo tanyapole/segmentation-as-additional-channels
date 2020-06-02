@@ -8,8 +8,8 @@ ALL_ATTRIBUTES = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle',
 IMAGE_PATH = 'images_npy'
 MASK_PATH = 'masks_npy'
 
-K1 = 1
-K2 = 2
+K1 = 100
+K2 = 100
 
 TRAIN_TRAIN_NUMBER = 2500
 TRAIN_VALID_NUMBER = 413
