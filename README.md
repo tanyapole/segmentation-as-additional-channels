@@ -3,7 +3,7 @@ Using segmentation masks as additional channels for classification
 
 All implemented methods realised in separated branches of this repository to distinguish them and to ease code debugging.
 
-1. Base neural network based methods
+1. Base neural network based methods (NNmethods branch).
 2. Direct using masks methods:
    - Zeroing masks (Zeroing_masks branch).
    - Std loss (Aux_loss branch).
