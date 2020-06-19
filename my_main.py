@@ -42,7 +42,7 @@ if __name__ == "__main__":
         args.N = experiment
         print(args)
         
-        print('_' * 40)
+        """print('_' * 40)
         print('pretrain UNet on {} for {} epoch'.format(TRAIN_TRAIN_NUMBER, K1))
         results1 = train(args, results1, SEED=SEED, train_type=PRETRAIN, epochs=K1)
         print_save_results(args, results1, time, PRETRAIN)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         print('_' * 40)
         print('train y_net on {} for {} epoch'.format(TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, K2))
         results2 = train(args, results2, SEED=SEED, train_type=YNET, epochs=K2)
-        print_save_results(args, results2, time, YNET)
+        print_save_results(args, results2, time, YNET)"""
 
         print('_' * 40)
         print('train resnest101 on {} for {} epoch to compare'.format(TRAIN_TRAIN_NUMBER+TRAIN_VALID_NUMBER, K1+K2))

@@ -202,7 +202,6 @@ class Unet(nn.Module):
 
         x1 = self.down1(x)  # -> 112x112x128
         x2 = self.down2(x1)  # -> 56x56x128
-
         x3 = self.down3(x2)  # -> 56x56x256
         x4 = self.down4(x3)  # -> 28x28x512
         x5 = self.down5(x4)  # -> 14x14x1024
@@ -213,7 +212,6 @@ class Unet(nn.Module):
         z = self.up1((b, x5))  # -> 14x14x1024
         z = self.up2((z, x4))  # -> 28x28x512
         z = self.up3((z, x3))  # -> 56x56x256
-
         z = self.up4((z, x1))  # -> 112x112x128
         z = self.up5((z, x))  # -> 224x224x64
         z = self.conv_segm(z)  # -> 224x224xn
