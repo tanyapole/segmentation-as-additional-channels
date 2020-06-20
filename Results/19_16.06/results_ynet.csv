@@ -1,0 +1,3 @@
+batch_size,epoch,exp,loss,lr,metric,normalization,pretrained,train_mode,train_type
+40.0,0.0,0.0,0.29932263946533205,0.0001,0.38173581523804373,1.0,1.0,train,ynet
+40.0,0.0,0.0,0.16647904242078462,0.0001,0.6447607346332427,1.0,1.0,valid,ynet
