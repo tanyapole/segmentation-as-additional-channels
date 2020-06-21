@@ -14,5 +14,5 @@ All implemented methods realised in separated branches of this repository to dis
 Each branch has description in its own Readme file.
 
 ## Dataset ISIC
-This dataset contains 2594 images of 5 melanocytic attributes: globules, milia-like cysts, negative network, pigment network, streaks&dots. Examples with topology of attributes you can see at the picture below:
+All methods (except future work on VOC dataset) use the ISIC dataset. This dataset contains 2594 images of 5 melanocytic attributes: globules, milia-like cysts, negative network, pigment network, streaks&dots. Examples with topology of attributes you can see at the picture below:
 ![Alt text](pics/eng_ISIC.png)
