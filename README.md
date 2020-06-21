@@ -17,7 +17,7 @@ python main.py --model resnet50 --pretrained --N 5 --lr 0.0001 --batch_size 5 --
 ### First experiment. 5 classes VGG16 train.
 In this experiment model resnet50 is trained during 100 epochs 5 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
 1. Prepare data as it stated in "Data preporation" section
-2. To repeat first experiment run command:
+2. To repeat this experiment run command:
 ~~~~
 python main.py --model vgg16 --pretrained --N 5 --lr 0.0001 --batch_size 5 --attribute attribute_globules attribute_milia_like_cyst attribute_negative_network attribute_pigment_network attribute_streaks  --n_epochs 200 --workers 1 --optimizer adam --image_path /path/to/images/
 ~~~~
@@ -25,7 +25,7 @@ python main.py --model vgg16 --pretrained --N 5 --lr 0.0001 --batch_size 5 --att
 ### Second experiment. 5 classes resnet50 train.
 In this experiment model resnet50 is trained during 100 epochs 5 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
 1. Prepare data as it stated in "Data preporation" section
-2. To repeat first experiment run command:
+2. To repeat this experiment run command:
 ~~~~
 python main.py --model resnet50 --pretrained --N 5 --lr 0.0001 --batch_size 5 --attribute attribute_globules attribute_milia_like_cyst attribute_negative_network attribute_pigment_network attribute_streaks  --n_epochs 200 --workers 1 --optimizer adam --image_path /path/to/images/
 ~~~~
