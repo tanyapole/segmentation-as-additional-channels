@@ -12,7 +12,7 @@ python Preprocessing/preprocess --impath /path/to/images/ --maskpath /path/to/ma
 ## Experiments
 
 ### First experiment. Pair MSE loss train.
-In this experiment model resnet50 is trained during 100 epochs 1 times using all image classes.
+In this experiment model resnet50 is trained during 100 epochs 1 times using all image classes using pair MSE loss correction.
 1. Prepare data as it stated in "Data preporation" section
 2. To repeat this experiment run command:
 ~~~~
