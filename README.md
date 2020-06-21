@@ -7,35 +7,27 @@ This algorithm compares neural networks in multi-classification task using segme
 my_preprocess.py module transforms original images and masks to h5py format
 
 1. Download skin images and their masks from [ISIC2018 lession attribute detection challenge](https://challenge.kitware.com/#phase/5abcbb6256357d0139260e5f)
-2. Run shell prompt from root of the project.
-3. Execute command to make the script runnable for you
+2. run with following parameters:
 ~~~~
-chmod u+x bash_scripts/prepare.sh
-~~~~
-4. run prepare.sh with following parameters:
-   1. */path/to/images/*
-   2. */path/to/masks/*
-   3. */path/to/save/*
-   4. *resize_size*
-   5. *number_of_parallel_jobs*
-~~~~
-. Bash_scripts/prepare.sh Data/skin_images/ Data/skin_masks/ Data/h5/ 224 12
+python Preprocessing/preprocess --impath /path/to/images/ --maskpath /path/to/masks/ --svpath /path/to/save/ --size 224 --jobs 12
 ~~~~
 ## Experiments
+python main.py --model resnet50 --pretrained --N 5 --lr 0.0001 --batch_size 5 --attribute attribute_globules attribute_milia_like_cyst attribute_negative_network attribute_pigment_network attribute_streaks  --n_epochs 100 --workers 1 --optimizer adam --image_path ./$1
 
-### First experiment. 5 classes without masks train.
-In this experiment model resnet50 is trained during 100 epochs 10 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
+### First experiment. 5 classes VGG16 train.
+In this experiment model resnet50 is trained during 100 epochs 5 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
 1. Prepare data as it stated in "Data preporation" section
-2. Run shell prompt from root of the project.
-3. Execute command to make the script runnable for you
+2. To repeat first experiment run command:
 ~~~~
-chmod u+x bash_scripts/run_exp_base_train_2_class.sh
+python main.py --model vgg16 --pretrained --N 5 --lr 0.0001 --batch_size 5 --attribute attribute_globules attribute_milia_like_cyst attribute_negative_network attribute_pigment_network attribute_streaks  --n_epochs 200 --workers 1 --optimizer adam --image_path /path/to/images/
 ~~~~
-4. To repeat first experiment run *run_exp_base_train_2_class.sh* with following parameters:
-   1. *path/to/h5/files/*
-   2. *path/where/to/save/model/*
+
+### Second experiment. 5 classes resnet50 train.
+In this experiment model resnet50 is trained during 100 epochs 5 times using *5 image classes*: globules, milia_like_cyst, negative_network, pigment_network, streaks.
+1. Prepare data as it stated in "Data preporation" section
+2. To repeat first experiment run command:
 ~~~~
-. Bash_scripts/run_exp_base_train_2_class.sh Data/h5/ model/
+python main.py --model resnet50 --pretrained --N 5 --lr 0.0001 --batch_size 5 --attribute attribute_globules attribute_milia_like_cyst attribute_negative_network attribute_pigment_network attribute_streaks  --n_epochs 200 --workers 1 --optimizer adam --image_path /path/to/images/
 ~~~~
 
 
@@ -45,15 +37,3 @@ tensorboard --logdir runs
 ~~~~
 All hyperparameters and log during experiments are saving in the *'./runs/debug' folder*. <br>
 Also all results will be stored as csv file in the *'./Results/<start_day&time_of_the_experiment>/results.csv'*
-
-## Tasks
-- [x] Refactor code
-- [x] Add bash scripts
-- [x] Add readmi with explanations
-- [x] define thesis 
-- [x] update readme & bash scripts
-- [ ] compute 4 experiment 
-- [ ] add graphics to the project
-- [ ] process results of 3rd experiment
-- [ ] write thesis text
-- [ ] write article
