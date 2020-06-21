@@ -12,3 +12,6 @@ All implemented methods realised in separated branches of this repository to dis
 4. Future work on VOC dataset (VOC_ynet).
 
 Each branch has description in its own Readme file.
+
+## Dataset ISIC
+![Alt text](pics/eng_ISIC.png)
