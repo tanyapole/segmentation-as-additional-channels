@@ -59,9 +59,7 @@ def train(args, results: pd.DataFrame, SEED: int) -> pd.DataFrame:
     model.to(device)
 
     criterion = torch.nn.BCEWithLogitsLoss()
-
-    scheduler = MultiStepLR(optimizer, [50,100,140,180], gamma=0.2)
-
+    
     # writer = SummaryWriter()
     trn_dl, val_dl = make_loader(train_test_id, args, train='train', shuffle=True), \
                      make_loader(train_test_id, args, train='valid', shuffle=False)
