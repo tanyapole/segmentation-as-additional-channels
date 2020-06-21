@@ -6,7 +6,7 @@ import datetime
 import pandas as pd
 from pathlib import Path
 
-from train import train
+from Training.train import train
 from Utils.utils import print_save_results
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
