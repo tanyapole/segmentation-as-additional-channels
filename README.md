@@ -12,7 +12,7 @@ python Preprocessing/preprocess --impath /path/to/images/ --maskpath /path/to/ma
 ## Experiments
 
 ### First experiment. Aux retrain
-In this experiment model resnet50 is trained during 200 epochs 1 times using all image classes. Model resnet50 modificated so after output_size==28 auxiliary exit is added. And for all outputs from this output auxiliary loss is computed as sum of std of each unique image in batch. 
+In this experiment model resnet50 is trained during 100 epochs 1 times using all image classes. Model resnet50 modificated so after output_size==28 auxiliary exit is added. And for all outputs from this output auxiliary loss is computed as sum of std of each unique image in batch. 
 1. Prepare data as it stated in "Data preporation" section
 2. To repeat third experiment run:
 ~~~~
