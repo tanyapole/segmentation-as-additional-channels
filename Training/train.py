@@ -4,9 +4,9 @@ import torch
 from torch.backends import cudnn
 from pathlib import Path
 
-from my_dataset import make_loader
-from models import create_model
-from metrics import Metrics
+from Training.my_dataset import make_loader
+from Models.models import create_model
+from Training.metrics import Metrics
 from Utils.utils import save_weights, read_split_data, print_update
 
 
