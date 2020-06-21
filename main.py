@@ -4,8 +4,8 @@ import datetime
 
 import pandas as pd
 
-from train import train
-from Utils.constants import SEED_LIST, TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, PRETRAIN, YNET, BASELINE, K1, K2
+from Training.train import train
+from Utils.constants import SEED_LIST, TRAIN_TRAIN_NUMBER, TRAIN_VALID_NUMBER, YNET, K2
 from Utils.utils import print_save_results
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
