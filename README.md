@@ -1,7 +1,5 @@
-# segmentation-as-additional-channels
-Using segmentationmasks as additional channels for classification
-
-This algorithm compares neural networks in multi-classification task using segmentation masks as additional chanels with using just image information.
+# NNmethods
+This branch contains base experiments with classic neural networks without using mask's information, such as VGG16 & ResNet50.
 
 ## Data preparation
 my_preprocess.py module transforms original images and masks to h5py format
